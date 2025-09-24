@@ -31,6 +31,7 @@ body {
     Helvetica,
     Arial,
     "Apple Color Emoji",
+    var(--font-instrument-serif),
     "Segoe UI Emoji";
 }
 
