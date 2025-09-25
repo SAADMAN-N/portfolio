@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 
-export default function Menubar() {
+export default function Menubar({ onTidy }) {
   const dayDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
@@ -18,7 +18,7 @@ export default function Menubar() {
 
   return (
     <div
-      className="flex justify-between items-center h-8 px-2 text-[13px] tracking-wide"
+      className="flex justify-between items-center h-8 px-2 text-[13px] tracking-wide select-none"
       style={{
         backgroundColor: "rgba(52, 58, 64, 0.15)",
         backdropFilter: "blur(10px)",
@@ -43,8 +43,15 @@ export default function Menubar() {
         <button className="text-gray-700 hover:underline">Contact</button>
       </div>
 
-      {/* Right side: Icons and Time */}
+      {/* Right side: Tidy button, Icons and Time */}
       <div className="flex items-center space-x-4 gap-0.8">
+        <button
+          onClick={onTidy}
+          className="px-2 py-0.5 text-[12px] rounded-md bg-black/10 hover:bg-black/20 text-gray-900"
+          title="Reset desktop layout"
+        >
+          Tidy
+        </button>
         <span>
           <Image
             className="m-0 p-0"
