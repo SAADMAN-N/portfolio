@@ -9,6 +9,7 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 
 import { useEffect, useState } from "react";
 import { DndContext, useDraggable } from "@dnd-kit/core";
+import Window from "./Window";
 
 function DraggableItem({ item }) {
   const { setNodeRef, listeners, attributes, transform } = useDraggable({
@@ -217,7 +218,7 @@ export default function Desktop() {
           <DraggableItem key={item.id} item={item} />
         ))}
       </DndContext>
-
+      {/* <Window /> */}
       <Dock />
     </div>
   );

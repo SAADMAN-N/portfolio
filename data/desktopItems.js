@@ -5,6 +5,7 @@ const desktopItems = [
     icon: "/folder-icon.png",
     position: { top: 140, left: 80 },
     type: "folder",
+    bio: "Just a folder",
   },
   {
     id: 2,
@@ -12,6 +13,7 @@ const desktopItems = [
     icon: "/aboutme-icon.png",
     position: { top: 240, left: 80 },
     type: "folder",
+    bio: "Just a bit about me!",
   },
 ];
 
