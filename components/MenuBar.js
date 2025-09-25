@@ -39,8 +39,8 @@ export default function Menubar() {
         <span className="underline   text-gray-950 font-semibold underline-offset-2">
           Sharf's portfolio
         </span>
-        <a className="text-gray-700">Resume</a>
-        <a className="text-gray-700">Contact</a>
+        <button className="text-gray-700 hover:underline">Resume</button>
+        <button className="text-gray-700 hover:underline">Contact</button>
       </div>
 
       {/* Right side: Icons and Time */}

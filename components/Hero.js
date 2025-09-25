@@ -8,9 +8,6 @@ export default function Hero() {
       <div className="font-['Instrument_Serif'] font-bold text-right text-5xl flex justify-center items-center h-screen w-screen text-4xl font-bold text-black">
         Welcome to my portfolio
       </div>
-      <div className="font-['Instrument_Serif'] font-bold text-right text-5xl flex justify-center items-center h-screen w-screen text-4xl font-bold text-black">
-        Welcome to my portfolio
-      </div>
     </>
   );
 }
