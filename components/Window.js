@@ -19,7 +19,7 @@ export default function Window({ title, position, bio }) {
             <div className="text-[11px] tracking-wide uppercase text-[#8e8e93]">
               Favorites
             </div>
-            <button className="flex items-center gap-2 w-full px-2 py-1 rounded-md hover:bg-[#6A6868]/70 focus:bg-[#6A6868] text-left">
+            <button className="flex items-center gap-2 w-full px-2 py-1 rounded-md hover:bg-[#2c2c2e]/70 focus:bg-[#2c2c2e] text-left">
               <Image
                 className="inline-block opacity-90"
                 src="/work-icon.svg"
@@ -43,12 +43,12 @@ export default function Window({ title, position, bio }) {
         {/* Toolbar/Header */}
         <div className="w-full h-16 rounded-tr-2xl p-0 m-0 pt-4 pl-10 bg-[#2c2c2e]/70 backdrop-blur-xl border-b border-[#2c2c2e]">
           <div className="text-[13px] font-medium text-[#f2f2f7]">{title}</div>
-          <div className="text-[11px] text-[#000000]">{bio}</div>
+          <div className="text-[11px] text-[rgb(102,238,229)]">{bio}</div>
         </div>
 
         {/* Content area */}
         <div className="w-full h-full rounded-br-2xl pl-10 bg-[#1c1c1e]/85 text-[#d1d1d6]">
-          <div>Content</div>
+          Content
         </div>
       </div>
     </div>
