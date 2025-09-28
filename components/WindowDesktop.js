@@ -124,8 +124,8 @@ export default function WindowDesktop({
                     <Image
                       src={item.icon}
                       alt={item.name}
-                      width={70}
-                      height={70}
+                      width={50}
+                      height={50}
                     />
                     <span className="mt-1 text-[14px] text-[#e5e5ea] text-center select-none font-semibold">
                       {item.name}
@@ -142,8 +142,8 @@ export default function WindowDesktop({
                       <Image
                         src={item.icon}
                         alt={item.name}
-                        width={70}
-                        height={70}
+                        width={10}
+                        height={10}
                       />
                       <span className="mt-1 text-[14px] text-[#e5e5ea] text-center select-none font-semibold">
                         {item.name}
