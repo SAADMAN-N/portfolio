@@ -10,8 +10,9 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useEffect, useState } from "react";
 import { DndContext, useDraggable } from "@dnd-kit/core";
 import Window from "./Window";
+import WindowDesktop from "./WindowDesktop";
 
-function DraggableItem({ item }) {
+function DraggableItem({ item, onItemClick }) {
   const { setNodeRef, listeners, attributes, transform } = useDraggable({
     id: item.id,
   });
@@ -29,6 +30,7 @@ function DraggableItem({ item }) {
       dragRef={setNodeRef}
       dragStyle={dragStyle}
       dragAttrs={dragAttrs}
+      onClick={onItemClick}
     />
   );
 }
@@ -55,6 +57,7 @@ function DraggableDesktopItem({ item, children }) {
 export default function Desktop() {
   const [items, setItems] = useState([]);
   const [initialized, setInitialized] = useState(false);
+  const [openWindows, setOpenWindows] = useState({});
 
   // One-time initialize positions: prefer saved, else top-right defaults with right-to-left stacking
   useEffect(() => {
@@ -161,6 +164,13 @@ export default function Desktop() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleItemClick = (item) => {
+    setOpenWindows((prev) => ({
+      ...prev,
+      [item.id]: !prev[item.id],
+    }));
+  };
+
   return (
     <div className="desktop-wallpaper" style={{ backgroundColor: "#F5F2E8" }}>
       <Menubar
@@ -215,10 +225,28 @@ export default function Desktop() {
         }}
       >
         {items.map((item) => (
-          <DraggableItem key={item.id} item={item} />
+          <DraggableItem
+            key={item.id}
+            item={item}
+            onItemClick={() => handleItemClick(item)}
+          />
         ))}
       </DndContext>
-      {/* <Window /> */}
+
+      {/* Desktop Windows - outside DndContext */}
+      {desktopItems.map(
+        (item) =>
+          openWindows[item.id] && (
+            <WindowDesktop
+              key={item.id}
+              title={item.label}
+              position={{ top: 100, left: 100 }}
+              bio={item.bio}
+              desktopItem={item}
+            />
+          )
+      )}
+
       <Dock />
     </div>
   );
