@@ -1,4 +1,4 @@
-import Window from "@/components/Window";
+import WindowDesktop from "@/components/WindowDesktop";
 import desktopItems from "@/data/desktopItems";
 
 export default function Test() {
@@ -7,11 +7,12 @@ export default function Test() {
       {desktopItems.map(
         (item) =>
           item.id === 2 && (
-            <Window
+            <WindowDesktop
               key={item.id}
               title={item.label}
               position={item.position}
               bio={item.bio}
+              desktopItem={item}
             />
           )
       )}

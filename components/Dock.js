@@ -2,7 +2,7 @@ import DockIcon from "./DockIcon";
 
 export default function Dock() {
   return (
-    <div className="w-full flex justify-center fixed bottom-4 left-0 right-0">
+    <div className="w-full flex justify-center fixed bottom-4 left-0 right-0 z-[9999]">
       <div
         className="h-[50px] w-[60vw] flex justify-between items-center 
         rounded-2xl backdrop-blur-[20px]

@@ -9,8 +9,8 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 
 import { useEffect, useState } from "react";
 import { DndContext, useDraggable } from "@dnd-kit/core";
-import Window from "./Window";
 import WindowDesktop from "./WindowDesktop";
+import { aboutMeWindows } from "@/data/aboutMeWindows";
 
 function DraggableItem({ item, onItemClick }) {
   const { setNodeRef, listeners, attributes, transform } = useDraggable({
@@ -165,10 +165,19 @@ export default function Desktop() {
   }, []);
 
   const handleItemClick = (item) => {
-    setOpenWindows((prev) => ({
-      ...prev,
-      [item.id]: !prev[item.id],
-    }));
+    setOpenWindows((prev) => {
+      // Close all other windows first
+      const closedAll = Object.keys(prev).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+      }, {});
+
+      // Then toggle the clicked item
+      return {
+        ...closedAll,
+        [item.id]: !prev[item.id],
+      };
+    });
   };
 
   return (
@@ -234,18 +243,43 @@ export default function Desktop() {
       </DndContext>
 
       {/* Desktop Windows - outside DndContext */}
-      {desktopItems.map(
-        (item) =>
-          openWindows[item.id] && (
+      {desktopItems.map((item) => {
+        if (!openWindows[item.id]) return null;
+
+        // Special case: About Me opens 3 windows
+        if (item.id === 2) {
+          return aboutMeWindows.map((windowPreset, index) => (
             <WindowDesktop
-              key={item.id}
-              title={item.label}
-              position={{ top: 100, left: 100 }}
-              bio={item.bio}
+              key={`${item.id}-${windowPreset.id}`}
+              title={windowPreset.header.title}
+              position={windowPreset.position}
+              bio={windowPreset.header.bio}
               desktopItem={item}
+              width={windowPreset.size.width}
+              height={windowPreset.size.height}
+              content={windowPreset.content}
+              onClose={() =>
+                setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
+              }
+              style={{ zIndex: 99 + index }}
             />
-          )
-      )}
+          ));
+        }
+
+        // Default case: single window for other items
+        return (
+          <WindowDesktop
+            key={item.id}
+            title={item.label}
+            position={{ top: 100, left: 100 }}
+            bio={item.bio}
+            desktopItem={item}
+            onClose={() =>
+              setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
+            }
+          />
+        );
+      })}
 
       <Dock />
     </div>
