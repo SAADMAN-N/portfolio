@@ -1,21 +1,8 @@
+"use client";
 import WindowDesktop from "@/components/WindowDesktop";
 import desktopItems from "@/data/desktopItems";
+import PhotoViewer from "@/components/PhotoViewer";
 
 export default function Test() {
-  return (
-    <>
-      {desktopItems.map(
-        (item) =>
-          item.id === 2 && (
-            <WindowDesktop
-              key={item.id}
-              title={item.label}
-              position={item.position}
-              bio={item.bio}
-              desktopItem={item}
-            />
-          )
-      )}
-    </>
-  );
+  return <PhotoViewer />;
 }
