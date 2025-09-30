@@ -637,6 +637,16 @@ class InfiniteGridMenu {
     },
   };
 
+  // Intro sequence state
+  intro = {
+    playing: false,
+    startedAt: 0,
+    durationMs: 1000,
+    zStart: 8,
+    zEnd: 5,
+    spin: 0.5,
+  };
+
   nearestVertexIndex = null;
   smoothRotationVelocity = 0;
   scaleFactor = 1.0;
@@ -772,11 +782,23 @@ class InfiniteGridMenu {
       this.#onControlUpdate(deltaTime)
     );
 
+    // Start zoomed out for intro. Will be overridden if intro not used
+    this.camera.position[2] = this.intro.zStart;
     this.#updateCameraMatrix();
     this.#updateProjectionMatrix(gl);
     this.resize();
 
     if (onInit) onInit(this);
+  }
+
+  playIntro() {
+    if (this.intro.playing) return;
+    this.intro.playing = true;
+    this.intro.startedAt = performance.now();
+    this.onMovementChange(true);
+    // Ensure we start from zStart
+    this.camera.position[2] = this.intro.zStart;
+    this.#updateCameraMatrix();
   }
 
   #initTexture() {
@@ -812,7 +834,40 @@ class InfiniteGridMenu {
       images.forEach((img, i) => {
         const x = (i % this.atlasSize) * cellSize;
         const y = Math.floor(i / this.atlasSize) * cellSize;
-        ctx.drawImage(img, x, y, cellSize, cellSize);
+
+        // Fill cell background (prevents transparent edges)
+        ctx.fillStyle = "#000";
+        ctx.fillRect(x, y, cellSize, cellSize);
+
+        // Draw the image into the square cell using "cover" behavior (no stretching)
+        const imgAspect = img.width / img.height;
+        const cellAspect = 1; // square cells
+
+        // Apply grayscale only to the photo content
+        ctx.save();
+        ctx.filter = "grayscale(100%)";
+
+        if (imgAspect > cellAspect) {
+          // Image is wider than cell: crop left/right
+          const newHeight = img.height;
+          const newWidth = newHeight * cellAspect;
+          const sx = Math.max(0, Math.floor((img.width - newWidth) / 2));
+          const sy = 0;
+          const sWidth = Math.min(img.width, Math.floor(newWidth));
+          const sHeight = img.height;
+          ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, cellSize, cellSize);
+        } else {
+          // Image is taller than cell: crop top/bottom
+          const newWidth = img.width;
+          const newHeight = newWidth / cellAspect;
+          const sx = 0;
+          const sy = Math.max(0, Math.floor((img.height - newHeight) / 2));
+          const sWidth = img.width;
+          const sHeight = Math.min(img.height, Math.floor(newHeight));
+          ctx.drawImage(img, sx, sy, sWidth, sHeight, x, y, cellSize, cellSize);
+        }
+
+        ctx.restore();
       });
 
       gl.bindTexture(gl.TEXTURE_2D, this.tex);
@@ -877,13 +932,14 @@ class InfiniteGridMenu {
     let positions = this.instancePositions.map((p) =>
       vec3.transformQuat(vec3.create(), p, this.control.orientation)
     );
-    const scale = 0.25;
+    // Base disc scale. Lowering keeps circles smaller in view
+    const baseScale = 0.22;
     const SCALE_INTENSITY = 0.6;
     positions.forEach((p, ndx) => {
       const s =
         (Math.abs(p[2]) / this.SPHERE_RADIUS) * SCALE_INTENSITY +
         (1 - SCALE_INTENSITY);
-      const finalScale = s * scale;
+      const finalScale = s * baseScale;
       const matrix = mat4.create();
       mat4.multiply(
         matrix,
@@ -1009,18 +1065,54 @@ class InfiniteGridMenu {
   #onControlUpdate(deltaTime) {
     const timeScale = deltaTime / this.TARGET_FRAME_DURATION + 0.0001;
     let damping = 5 / timeScale;
-    let cameraTargetZ = 3;
+    // Default resting distance should match intro end so we keep the globe view
+    let cameraTargetZ = this.intro.zEnd;
+
+    // Handle intro animation: zoom and gentle spin
+    if (this.intro.playing) {
+      const now = performance.now();
+      const t = Math.min(
+        1,
+        (now - this.intro.startedAt) / this.intro.durationMs
+      );
+      const easeOutCubic = (x) => 1 - Math.pow(1 - x, 3);
+      const k = easeOutCubic(t);
+      cameraTargetZ =
+        this.intro.zStart + (this.intro.zEnd - this.intro.zStart) * k;
+
+      // Apply a small spin during intro
+      const angle = this.intro.spin * timeScale * 0.05; // gentle
+      const spinQuat = quat.setAxisAngle(quat.create(), [0, 1, 0], angle);
+      this.control.orientation = quat.multiply(
+        quat.create(),
+        spinQuat,
+        this.control.orientation
+      );
+      quat.normalize(this.control.orientation, this.control.orientation);
+
+      // Keep text hidden during intro
+      this.movementActive = true;
+      this.onMovementChange(true);
+
+      if (t >= 1) {
+        this.intro.playing = false;
+        // Let text appear
+        this.movementActive = false;
+        this.onMovementChange(false);
+      }
+    }
 
     const isMoving =
       this.control.isPointerDown ||
-      Math.abs(this.smoothRotationVelocity) > 0.01;
+      Math.abs(this.smoothRotationVelocity) > 0.01 ||
+      this.intro.playing;
 
-    if (isMoving !== this.movementActive) {
+    if (!this.intro.playing && isMoving !== this.movementActive) {
       this.movementActive = isMoving;
       this.onMovementChange(isMoving);
     }
 
-    if (!this.control.isPointerDown) {
+    if (!this.control.isPointerDown && !this.intro.playing) {
       const nearestVertexIndex = this.#findNearestVertexIndex();
       const itemIndex = nearestVertexIndex % Math.max(1, this.items.length);
       this.onActiveItemChange(itemIndex);
@@ -1034,6 +1126,7 @@ class InfiniteGridMenu {
       damping = 7 / timeScale;
     }
 
+    // Smooth camera to target Z
     this.camera.position[2] +=
       (cameraTargetZ - this.camera.position[2]) / damping;
     this.#updateCameraMatrix();
@@ -1098,7 +1191,10 @@ export default function InfiniteMenu({ items = [] }) {
         items.length ? items : defaultItems,
         handleActiveItem,
         setIsMoving,
-        (sk) => sk.run()
+        (sk) => {
+          sk.playIntro();
+          sk.run();
+        }
       );
     }
 
@@ -1126,11 +1222,11 @@ export default function InfiniteMenu({ items = [] }) {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full rounded-2xl">
       <canvas
         id="infinite-grid-menu-canvas"
         ref={canvasRef}
-        className="cursor-grab w-full h-full overflow-hidden relative outline-none active:cursor-grabbing"
+        className="cursor-grab w-full h-full overflow-hidden rounded-2xl border-3 border-black/60 backdrop-blur-lg relative outline-none active:cursor-grabbing"
       />
 
       {activeItem && (
@@ -1141,12 +1237,13 @@ export default function InfiniteMenu({ items = [] }) {
           absolute
           font-black
           [font-size:2rem]
-          left-[2.5em]
+          left-[1.8em]
           top-1/2
           transform
-          translate-x-[20%]
+          rounded-2xl
           -translate-y-1/2
           transition-all
+            max-w-[10ch]
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
           ${
             isMoving
@@ -1162,16 +1259,18 @@ export default function InfiniteMenu({ items = [] }) {
             className={`
           select-none
           absolute
-          max-w-[10ch]
-          text-[1.5rem]
+          text-[1.3rem]
           top-1/2
-          right-[1%]
+          right-[2.5em]
+          max-w-[10ch]
+          text-right
           transition-all
           ease-[cubic-bezier(0.25,0.1,0.25,1.0)]
+          rounded-2xl
           ${
             isMoving
-              ? "opacity-0 pointer-events-none duration-[100ms] translate-x-[-60%] -translate-y-1/2"
-              : "opacity-100 pointer-events-auto duration-[500ms] translate-x-[-90%] -translate-y-1/2"
+              ? "opacity-0 pointer-events-none duration-[100ms] -translate-y-1/2"
+              : "opacity-100 pointer-events-auto duration-[500ms] -translate-y-1/2"
           }
         `}
           >

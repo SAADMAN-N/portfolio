@@ -10,6 +10,8 @@ import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { useEffect, useState } from "react";
 import { DndContext, useDraggable } from "@dnd-kit/core";
 import WindowDesktop from "./WindowDesktop";
+import PhotoViewer from "./PhotoViewer";
+import AboutMe from "./AboutMe";
 import { aboutMeWindows } from "@/data/aboutMeWindows";
 
 function DraggableItem({ item, onItemClick }) {
@@ -248,22 +250,50 @@ export default function Desktop() {
 
         // Special case: About Me opens 3 windows
         if (item.id === 2) {
-          return aboutMeWindows.map((windowPreset, index) => (
-            <WindowDesktop
-              key={`${item.id}-${windowPreset.id}`}
-              title={windowPreset.header.title}
-              position={windowPreset.position}
-              bio={windowPreset.header.bio}
-              desktopItem={item}
-              width={windowPreset.size.width}
-              height={windowPreset.size.height}
-              content={windowPreset.content}
-              onClose={() =>
-                setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
-              }
-              style={{ zIndex: 99 + index }}
-            />
-          ));
+          return aboutMeWindows.map((windowPreset, index) => {
+            // Special case: PhotoViewer for the 3rd window
+            if (windowPreset.type === "photo-viewer") {
+              return (
+                <PhotoViewer
+                  key={`${item.id}-photo-viewer`}
+                  top={`${windowPreset.position.top}px`}
+                  left={`${windowPreset.position.left}px`}
+                  style={{ zIndex: 99 + index }}
+                />
+              );
+            }
+
+            // Special case: AboutMe custom component for the 2nd window
+            if (windowPreset.type === "about-me") {
+              return (
+                <AboutMe
+                  key={`${item.id}-about-me`}
+                  width={windowPreset.size.width}
+                  height={windowPreset.size.height}
+                  position={windowPreset.position}
+                  style={{ zIndex: 99 + index }}
+                />
+              );
+            }
+
+            // Default WindowDesktop for first 2 windows
+            return (
+              <WindowDesktop
+                key={`${item.id}-${windowPreset.id}`}
+                title={windowPreset.header.title}
+                position={windowPreset.position}
+                bio={windowPreset.header.bio}
+                desktopItem={item}
+                width={windowPreset.size.width}
+                height={windowPreset.size.height}
+                content={windowPreset.content}
+                onClose={() =>
+                  setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
+                }
+                style={{ zIndex: 99 + index }}
+              />
+            );
+          });
         }
 
         // Default case: single window for other items
