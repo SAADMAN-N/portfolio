@@ -1,3 +1,5 @@
+import { VideoText } from "@/components/ui/video-text";
+
 export default function Hero() {
   return (
     <>
