@@ -844,8 +844,8 @@ class InfiniteGridMenu {
         const cellAspect = 1; // square cells
 
         // Apply grayscale only to the photo content
-        ctx.save();
-        ctx.filter = "grayscale(100%)";
+        // ctx.save();
+        // ctx.filter = "grayscale(0%)";
 
         if (imgAspect > cellAspect) {
           // Image is wider than cell: crop left/right

@@ -4,6 +4,7 @@ import { sidebarFolders } from "@/data/sidebarFolders";
 import { getContent } from "@/data/contentData";
 import Image from "next/image";
 import { useState } from "react";
+import { LinkPreview } from "@/components/ui/link-preview";
 
 export default function WindowDesktop({
   title,
@@ -30,7 +31,7 @@ export default function WindowDesktop({
       }}
     >
       {/* Sidebar */}
-      <div className="w-50 h-full rounded-l-2xl px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">
+      <div className="w-48 h-full rounded-l-2xl px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">
         <div className="flex h-10 rounded-tl-2xl p-3 gap-2 items-center">
           <div
             className="relative group cursor-pointer w-[12px] h-[12px]"
@@ -120,16 +121,28 @@ export default function WindowDesktop({
                   <div
                     key={index}
                     className="flex flex-col items-center cursor-pointer hover:bg-[#2c2c2e]/30 rounded-lg p-2"
+                    onClick={() => {
+                      window.open(item.link, "_blank");
+                    }}
                   >
-                    <Image
-                      src={item.icon}
-                      alt={item.name}
-                      width={50}
-                      height={50}
-                    />
-                    <span className="mt-1 text-[14px] text-[#e5e5ea] text-center select-none font-semibold">
-                      {item.name}
-                    </span>
+                    <LinkPreview
+                      url={item.link}
+                      className="font-bold bg-clip-text text-transparent bg-gradient-to-br from-purple-500 to-pink-500"
+                      height={100}
+                      quality={100}
+                      isStatic={item.isStatic || false}
+                      imageSrc={item.imageSrc}
+                    >
+                      <Image
+                        src={item.icon}
+                        alt={item.name}
+                        width={50}
+                        height={50}
+                      />
+                      <span className="mt-1 text-[14px] text-[#e5e5ea] text-center select-none font-semibold">
+                        {item.name}
+                      </span>
+                    </LinkPreview>{" "}
                   </div>
                 ))
               : // Default content for other windows

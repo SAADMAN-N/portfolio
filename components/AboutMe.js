@@ -11,8 +11,10 @@ import {
   AvatarGroupTooltip,
 } from "@/components/animate-ui/primitives/animate/avatar-group.jsx";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
+import { frameworkData } from "@/data/frameworkData";
+import { libntoolsData } from "@/data/libntoolsData";
 import { OrbitingCircles } from "@/components/ui/orbiting-circles";
+
 export default function AboutMe({
   width,
   height,
@@ -124,10 +126,74 @@ export default function AboutMe({
             }
           />
           <BentoCard
+            className="col-span-1 row-span-1"
+            name="Languages"
+            description=""
+            cta=""
+            href="#"
+            background={
+              <div className="flex pl-[10px]">
+                <Image
+                  src="/language-icon.png"
+                  alt="languages-icon"
+                  width={100}
+                  height={100}
+                  className="absolute -bottom-[30px] -right-[10px]"
+                />
+                <AvatarGroup
+                  side="bottom"
+                  alignOffset={5}
+                  className="mx-[5px] flex justify-end"
+                >
+                  {langData.map((avatar, index) => (
+                    <Avatar key={index} className="size-7 top-5">
+                      <AvatarImage src={avatar.src} />
+                      <AvatarFallback>{avatar.fallback}</AvatarFallback>
+                      <AvatarGroupTooltip size="sm">
+                        {avatar.tooltip}
+                      </AvatarGroupTooltip>
+                    </Avatar>
+                  ))}
+                </AvatarGroup>
+              </div>
+            }
+          ></BentoCard>
+
+          <BentoCard
+            className="col-span-1 row-span-1"
+            name="Frameworks"
+            description=""
+            cta=""
+            href="#"
+            background={
+              <div className="flex pl-[10px]">
+                <Image
+                  src="/framework-icon.png"
+                  alt="frameworks-icon"
+                  width={100}
+                  height={100}
+                  className="absolute -bottom-[30px] -right-[10px]"
+                />
+                <AvatarGroup
+                  side="bottom"
+                  alignOffset={10}
+                  className="ml-[10px]"
+                >
+                  {frameworkData.map((avatar, index) => (
+                    <Avatar key={index} className="size-7 top-5 ml-[3px]">
+                      <AvatarImage src={avatar.src} />
+                      <AvatarFallback>{avatar.fallback}</AvatarFallback>
+                      <AvatarGroupTooltip>{avatar.tooltip}</AvatarGroupTooltip>
+                    </Avatar>
+                  ))}
+                </AvatarGroup>
+              </div>
+            }
+          ></BentoCard>
+          <BentoCard
             className="col-span-1 row-span-2 "
             name="My techstack"
             description=""
-            cta="View wins"
             href="#"
             background={
               <div className="absolute inset-0 -top-20 w-[80%] flex justify-end items-center">
@@ -148,18 +214,7 @@ export default function AboutMe({
               </div>
             }
           />
-          <BentoCard
-            className="col-span-1 row-span-1"
-            name="I love to travel"
-            description="If you see me, ask me where I'm going next! (I probably have tickets booked)"
-            cta="Open"
-            href="#"
-            background={
-              <div className="absolute inset-0 z-0 pointer-events-none flex items-start justify-end p-4">
-                <Globe className="w-[435px] h-[435px]" />
-              </div>
-            }
-          />
+
           <BentoCard
             className="col-span-2 row-span-1 inline-block"
             name="My Design Philosophy"
@@ -185,64 +240,40 @@ export default function AboutMe({
               </div>
             }
           />
-          <BentoCard
-            className="col-span-1 row-span-1"
-            name="Languages I use"
-            description=""
-            cta=""
-            href="#"
-            background={
-              <div>
-                <AvatarGroup
-                  side="bottom"
-                  alignOffset={10}
-                  className="ml-[10px]"
-                >
-                  {langData.map((avatar, index) => (
-                    <Avatar key={index} className="size-7 top-5 ml-[3px]">
-                      <AvatarImage src={avatar.src} />
-                      <AvatarFallback>{avatar.fallback}</AvatarFallback>
-                      <AvatarGroupTooltip>{avatar.tooltip}</AvatarGroupTooltip>
-                    </Avatar>
-                  ))}
-                </AvatarGroup>
-              </div>
-            }
-          ></BentoCard>
 
           <BentoCard
             className="col-span-1 row-span-1"
-            name="Languages I use"
+            name="I love to travel"
+            description="If you see me, ask me where I'm going next! (I probably have tickets booked)"
+            cta="Open"
+            href="#"
+            background={
+              <div className="absolute inset-0 z-0 pointer-events-none flex items-start justify-end p-4">
+                <Globe className="w-[435px] h-[435px]" />
+              </div>
+            }
+          />
+          <BentoCard
+            className="col-span-1 row-span-1 flex justfy-start w-full"
+            name="Tools & Libraries"
             description=""
             cta=""
             href="#"
             background={
-              <div>
+              <div className="flex w-full flex-col items-start gap-5 mb-12 h-full justify-end pb-[25px]">
                 <AvatarGroup
-                  side="bottom"
+                  side="top"
+                  className="pl-[15px] pt-[10px]"
                   alignOffset={10}
-                  className="ml-[10px]"
                 >
-                  {langData.map((avatar, index) => (
-                    <Avatar key={index} className="size-7 top-5 ml-[3px]">
+                  {libntoolsData.map((avatar, index) => (
+                    <Avatar key={index}>
                       <AvatarImage src={avatar.src} />
                       <AvatarFallback>{avatar.fallback}</AvatarFallback>
                       <AvatarGroupTooltip>{avatar.tooltip}</AvatarGroupTooltip>
                     </Avatar>
                   ))}
                 </AvatarGroup>
-              </div>
-            }
-          ></BentoCard>
-          <BentoCard
-            className="col-span-1 row-span-1"
-            name="Frameworks I use"
-            description=""
-            cta=""
-            href="#"
-            background={
-              <div className="relative flex h-[500px] w-full flex-col items-center justify-center overflow-hidden">
-                <OrbitingCircles iconSize={40}></OrbitingCircles>
               </div>
             }
           ></BentoCard>

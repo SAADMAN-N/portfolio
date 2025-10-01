@@ -37,9 +37,25 @@ export const langData = [
   // Next.js
   // (Considered using the "plain" icon, but sticking with the "original" for consistency.)
 
+  // TypeScript
+  // (Tried the "plain" icon, but the "original" one pops more.)
   {
-    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
-    fallback: "SQL",
-    tooltip: "SQL",
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
+    fallback: "TS",
+    tooltip: "TypeScript",
+  },
+  // C
+  // (Fun fact: the "original" icon is a nice blue hexagon.)
+  {
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg",
+    fallback: "C",
+    tooltip: "C",
+  },
+  // C++
+  // (Tried the "plain" icon, but the "original" one is more recognizable.)
+  {
+    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
+    fallback: "C++",
+    tooltip: "C++",
   },
 ];

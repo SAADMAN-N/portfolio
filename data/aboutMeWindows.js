@@ -3,13 +3,27 @@ export const aboutMeWindows = [
   {
     id: "about-text",
     position: { top: 500, left: 900 },
-    size: { width: 560, height: 300 },
+    size: { width: 500, height: 300 },
     header: { title: "Connect with me", bio: "Links" },
     content: {
       items: [
-        { name: "Github", icon: "/github-icon.svg" },
-        { name: "LinkedIn", icon: "/linkedin-icon.png" },
-        { name: "Resume", icon: "/file-icon.png" },
+        {
+          name: "Github",
+          icon: "/github-icon.svg",
+          link: "https://github.com/SAADMAN-N",
+        },
+        {
+          name: "LinkedIn",
+          icon: "/linkedin-icon.png",
+          link: "https://www.linkedin.com/in/sharfsadman/",
+        },
+        {
+          name: "Resume",
+          icon: "/file-icon.png",
+          link: "/resume.pdf",
+          isStatic: true,
+          imageSrc: "/preview-resume.png",
+        },
       ],
     },
   },
