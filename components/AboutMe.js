@@ -14,7 +14,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { frameworkData } from "@/data/frameworkData";
 import { libntoolsData } from "@/data/libntoolsData";
 import { OrbitingCircles } from "@/components/ui/orbiting-circles";
-
+import { dbData } from "@/data/dbData";
+import { skillsData } from "@/data/skillsData";
 export default function AboutMe({
   width,
   height,
@@ -180,7 +181,7 @@ export default function AboutMe({
                   className="ml-[10px]"
                 >
                   {frameworkData.map((avatar, index) => (
-                    <Avatar key={index} className="size-7 top-5 ml-[3px]">
+                    <Avatar key={index} className="size-7 top-5 ">
                       <AvatarImage src={avatar.src} />
                       <AvatarFallback>{avatar.fallback}</AvatarFallback>
                       <AvatarGroupTooltip>{avatar.tooltip}</AvatarGroupTooltip>
@@ -190,20 +191,24 @@ export default function AboutMe({
               </div>
             }
           ></BentoCard>
+
           <BentoCard
-            className="col-span-1 row-span-2 "
-            name="My techstack"
+            className="col-span-1 row-span-1"
+            name="Databases"
             description=""
             href="#"
             background={
-              <div className="absolute inset-0 -top-20 w-[80%] flex justify-end items-center">
+              <div className="absolute pl-[10px]">
                 <link
                   rel="stylesheet"
                   type="text/css"
                   href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
                 />
-                <AvatarGroup>
-                  {techstackData.map((avatar, index) => (
+                <AvatarGroup
+                  className="absolute top-0 p-[10px] mt-3"
+                  side="bottom"
+                >
+                  {dbData.map((avatar, index) => (
                     <Avatar key={index}>
                       <AvatarImage src={avatar.src} />
                       <AvatarFallback>{avatar.fallback}</AvatarFallback>
@@ -237,6 +242,31 @@ export default function AboutMe({
                   height={60}
                   className="rotate-350 absolute -bottom-[10px] right-0"
                 />
+              </div>
+            }
+          />
+
+          <BentoCard
+            className="col-span-1 row-span-1 "
+            name="Skills"
+            description=""
+            href="#"
+            background={
+              <div className="absolute inset-0 -top-20 w-[80%] flex justify-end items-center">
+                <link
+                  rel="stylesheet"
+                  type="text/css"
+                  href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+                />
+                <AvatarGroup>
+                  {skillsData.map((avatar, index) => (
+                    <Avatar key={index}>
+                      <AvatarImage src={avatar.src} />
+                      <AvatarFallback>{avatar.fallback}</AvatarFallback>
+                      <AvatarGroupTooltip>{avatar.tooltip}</AvatarGroupTooltip>
+                    </Avatar>
+                  ))}
+                </AvatarGroup>
               </div>
             }
           />
