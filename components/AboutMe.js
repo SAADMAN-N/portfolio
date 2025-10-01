@@ -36,7 +36,7 @@ export default function AboutMe({
         color="black"
       />
       {/* Foreground content (Bento grid placeholder) */}
-      <div className="relative z-10 w-full h-full p-1  backdrop-blur-lg  overflow-auto rounded-2xl">
+      <div className="relative z-10 w-full h-full p-2 backdrop-blur-lg  overflow-auto rounded-2xl">
         {/* Put your <BentoGrid> here; this div stays above the FlickeringGrid */}
         <BentoGrid
           className="h-full  w-full grid-cols-3 rounded-2xl  auto-rows-[10rem] gap-2 p-0 backdrop-blur-lg "
@@ -55,7 +55,7 @@ export default function AboutMe({
                     texts={["Hi!", "I'm Sharf!"]}
                     className="w-full absolute left-0 text-left ml-[15px]"
                   />
-                  <p className="absolute text-[15px] p-5 text-left top-20 space-y-1">
+                  <p className="absolute text-[15px] text-left top-20 space-y-1 p-5">
                     {/* Hey, here's my "About Me" intro with some fun highlights and underlines! */}
                     Hello, I’m{" "}
                     <Highlighter

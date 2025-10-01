@@ -16,7 +16,7 @@ export const aboutMeWindows = [
   {
     id: "about-tech",
     position: { top: 50, left: 10 },
-    size: { width: 725, height: 677 },
+    size: { width: 725, height: 685 },
     header: { title: "About Me", bio: "Just a bit about me!" },
     type: "about-me",
     content: {
