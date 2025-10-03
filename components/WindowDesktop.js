@@ -121,9 +121,6 @@ export default function WindowDesktop({
                   <div
                     key={index}
                     className="flex flex-col items-center cursor-pointer hover:bg-[#2c2c2e]/30 rounded-lg p-2"
-                    onClick={() => {
-                      window.open(item.link, "_blank");
-                    }}
                   >
                     <LinkPreview
                       url={item.link}
