@@ -320,7 +320,7 @@ export default function Desktop() {
 
     const newNote = {
       id: `sticky-note-${Date.now()}`,
-      title: "New Note",
+      title: "~ Anonymous",
       content:
         "Leave a review or feedback here! Click to edit and share your thoughts.",
       position: {

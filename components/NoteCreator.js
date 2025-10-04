@@ -25,7 +25,10 @@ export default function NoteCreator({ onNoteCreated, onClose }) {
 
     const newNote = {
       id: `sticky-note-${Date.now()}`,
-      title: title || "New Note",
+      title:
+        noteType === "visitor"
+          ? `~ ${author || "Anonymous"}`
+          : title || "New Note",
       content: content || "Click to edit...",
       position: {
         top: Math.random() * 200 + 100,

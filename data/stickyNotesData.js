@@ -50,7 +50,7 @@ export const stickyNotesData = [
 export const addStickyNote = (notes, newNote) => {
   const defaultNote = {
     id: `sticky-note-${Date.now()}`,
-    title: "New Note",
+    title: "{Name/Anonymous}",
     content: "Click to edit...",
     position: { top: 100, left: 100 },
     size: { width: 250, height: 180 },
