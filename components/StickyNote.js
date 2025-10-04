@@ -1,7 +1,7 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useEffect } from "react";
 
 const StickyNote = memo(function StickyNote({
   id,
@@ -23,6 +23,20 @@ const StickyNote = memo(function StickyNote({
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [noteTitle, setNoteTitle] = useState(title);
   const [noteContent, setNoteContent] = useState(content);
+
+  // Sync local state with props when they change (important for reload persistence)
+  // Only sync when not actively editing to avoid interfering with user input
+  useEffect(() => {
+    if (!isEditingTitle) {
+      setNoteTitle(title);
+    }
+  }, [title, isEditingTitle]);
+
+  useEffect(() => {
+    if (!isEditingContent) {
+      setNoteContent(content);
+    }
+  }, [content, isEditingContent]);
 
   const { setNodeRef, listeners, attributes, transform, isDragging } =
     useDraggable({

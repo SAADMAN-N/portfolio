@@ -68,7 +68,8 @@ export const addStickyNote = (notes, newNote) => {
 
 // Helper function to get approved notes (for display)
 export const getApprovedNotes = (notes) => {
-  return notes.filter((note) => note.status === "approved");
+  // For now, return all notes regardless of status
+  return notes;
 };
 
 // Helper function to get pending notes (for admin review)
