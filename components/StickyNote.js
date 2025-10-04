@@ -1,7 +1,7 @@
 "use client";
 
 import { useDraggable } from "@dnd-kit/core";
-import { useState, useCallback, memo, useEffect } from "react";
+import { useState, useCallback, memo, useEffect, useRef } from "react";
 
 const StickyNote = memo(function StickyNote({
   id,
@@ -14,10 +14,13 @@ const StickyNote = memo(function StickyNote({
   isEditable = true,
   type = "permanent",
   author = null,
+  status = "approved",
+  createdAt = new Date().toISOString(),
   isMinimized = false,
   onUpdate,
   onMinimize,
   onMinimizeAll,
+  onDelete,
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingContent, setIsEditingContent] = useState(false);
@@ -30,6 +33,8 @@ const StickyNote = memo(function StickyNote({
     width: 0,
     height: 0,
   });
+  const [currentSize, setCurrentSize] = useState(size);
+  const noteRef = useRef(null);
 
   // Sync local state with props when they change (important for reload persistence)
   // Only sync when not actively editing to avoid interfering with user input
@@ -44,6 +49,13 @@ const StickyNote = memo(function StickyNote({
       setNoteContent(content);
     }
   }, [content, isEditingContent]);
+
+  // Sync currentSize with size prop when not resizing
+  useEffect(() => {
+    if (!isResizing) {
+      setCurrentSize(size);
+    }
+  }, [size, isResizing]);
 
   const { setNodeRef, listeners, attributes, transform, isDragging } =
     useDraggable({
@@ -61,7 +73,7 @@ const StickyNote = memo(function StickyNote({
   const handleSaveTitle = useCallback(() => {
     setIsEditingTitle(false);
     if (onUpdate) {
-      onUpdate({
+      const updateData = {
         id,
         title: noteTitle,
         content: noteContent,
@@ -70,7 +82,12 @@ const StickyNote = memo(function StickyNote({
         bgColor,
         textColor,
         isEditable,
-      });
+        type,
+        author,
+        status,
+        createdAt,
+      };
+      onUpdate(updateData);
     }
   }, [
     id,
@@ -81,13 +98,17 @@ const StickyNote = memo(function StickyNote({
     bgColor,
     textColor,
     isEditable,
+    type,
+    author,
+    status,
+    createdAt,
     onUpdate,
   ]);
 
   const handleSaveContent = useCallback(() => {
     setIsEditingContent(false);
     if (onUpdate) {
-      onUpdate({
+      const updateData = {
         id,
         title: noteTitle,
         content: noteContent,
@@ -96,7 +117,12 @@ const StickyNote = memo(function StickyNote({
         bgColor,
         textColor,
         isEditable,
-      });
+        type,
+        author,
+        status,
+        createdAt,
+      };
+      onUpdate(updateData);
     }
   }, [
     id,
@@ -107,6 +133,10 @@ const StickyNote = memo(function StickyNote({
     bgColor,
     textColor,
     isEditable,
+    type,
+    author,
+    status,
+    createdAt,
     onUpdate,
   ]);
 
@@ -118,16 +148,16 @@ const StickyNote = memo(function StickyNote({
       setResizeStart({
         x: e.clientX,
         y: e.clientY,
-        width: size.width,
-        height: size.height,
+        width: currentSize.width,
+        height: currentSize.height,
       });
     },
-    [size]
+    [currentSize]
   );
 
   const handleResizeMove = useCallback(
     (e) => {
-      if (!isResizing) return;
+      if (!isResizing || !noteRef.current) return;
 
       const deltaX = e.clientX - resizeStart.x;
       const deltaY = e.clientY - resizeStart.y;
@@ -135,36 +165,51 @@ const StickyNote = memo(function StickyNote({
       const newWidth = Math.max(150, resizeStart.width + deltaX);
       const newHeight = Math.max(100, resizeStart.height + deltaY);
 
-      if (onUpdate) {
-        onUpdate({
-          id,
-          title: noteTitle,
-          content: noteContent,
-          position,
-          size: { width: newWidth, height: newHeight },
-          bgColor,
-          textColor,
-          isEditable,
-        });
-      }
+      // Direct DOM manipulation for instant, smooth resize
+      const element = noteRef.current;
+      element.style.width = `${newWidth}px`;
+      element.style.height = `${newHeight}px`;
+
+      // Update state for final save
+      setCurrentSize({ width: newWidth, height: newHeight });
     },
-    [
-      isResizing,
-      resizeStart,
-      onUpdate,
-      id,
-      noteTitle,
-      noteContent,
-      position,
-      bgColor,
-      textColor,
-      isEditable,
-    ]
+    [isResizing, resizeStart]
   );
 
   const handleResizeEnd = useCallback(() => {
     setIsResizing(false);
-  }, []);
+    // Save the final size to parent component
+    if (onUpdate) {
+      onUpdate({
+        id,
+        title: noteTitle,
+        content: noteContent,
+        position,
+        size: currentSize,
+        bgColor,
+        textColor,
+        isEditable,
+        type,
+        author,
+        status,
+        createdAt,
+      });
+    }
+  }, [
+    onUpdate,
+    id,
+    noteTitle,
+    noteContent,
+    position,
+    currentSize,
+    bgColor,
+    textColor,
+    isEditable,
+    type,
+    author,
+    status,
+    createdAt,
+  ]);
 
   // Add global mouse event listeners for resize
   useEffect(() => {
@@ -200,21 +245,23 @@ const StickyNote = memo(function StickyNote({
   const handleTitleClick = useCallback(
     (e) => {
       e.stopPropagation();
-      if (isEditable && !isMinimized) {
+      // Only allow editing of visitor-type notes (user-created)
+      if (isEditable && !isMinimized && type === "visitor") {
         setIsEditingTitle(true);
       }
     },
-    [isEditable, isMinimized]
+    [isEditable, isMinimized, type]
   );
 
   const handleContentClick = useCallback(
     (e) => {
       e.stopPropagation();
-      if (isEditable) {
+      // Only allow editing of visitor-type notes (user-created)
+      if (isEditable && type === "visitor") {
         setIsEditingContent(true);
       }
     },
-    [isEditable]
+    [isEditable, type]
   );
 
   const handleMinimizeClick = useCallback(
@@ -225,9 +272,23 @@ const StickyNote = memo(function StickyNote({
     [onMinimize, id]
   );
 
+  const handleDeleteClick = useCallback(
+    (e) => {
+      e.stopPropagation();
+      // Only allow deletion of visitor-type notes (user-created)
+      if (type === "visitor" && onDelete) {
+        onDelete(id);
+      }
+    },
+    [type, onDelete, id]
+  );
+
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        noteRef.current = node;
+      }}
       data-sticky-note={id}
       className={`absolute select-none rounded-lg border border-gray-300/30 flex flex-col overflow-hidden [border-radius:0.5rem] ${
         isDragging
@@ -239,8 +300,8 @@ const StickyNote = memo(function StickyNote({
       style={{
         top: position.top,
         left: position.left,
-        width: size.width,
-        height: isMinimized ? 40 : size.height,
+        width: currentSize.width,
+        height: isMinimized ? 40 : currentSize.height,
         backgroundColor: bgColor,
         color: textColor,
         willChange: isDragging ? "transform" : "auto",
@@ -261,16 +322,15 @@ const StickyNote = memo(function StickyNote({
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {/* macOS Window Controls */}
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            {/* Close button (red) */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                // Add close functionality here if needed
-              }}
-              onMouseDown={handleStopPropagation}
-              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 transition-colors duration-150 flex-shrink-0"
-              title="Close"
-            />
+            {/* Close button (red) - only for visitor notes */}
+            {type === "visitor" && (
+              <button
+                onClick={handleDeleteClick}
+                onMouseDown={handleStopPropagation}
+                className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 transition-colors duration-150 flex-shrink-0"
+                title="Delete Note"
+              />
+            )}
             {/* Minimize button (yellow) */}
             <button
               onClick={handleMinimizeClick}
@@ -292,6 +352,7 @@ const StickyNote = memo(function StickyNote({
                   handleCancelTitle();
                 }
               }}
+              onBlur={handleSaveTitle}
               onFocus={(e) => {
                 e.target.select(); // Select all text when focused
               }}
@@ -303,7 +364,9 @@ const StickyNote = memo(function StickyNote({
             />
           ) : (
             <h3
-              className="font-medium text-sm truncate flex-1 min-w-0 cursor-text text-gray-800"
+              className={`font-medium text-sm truncate flex-1 min-w-0 text-gray-800 ${
+                type === "visitor" ? "cursor-text" : "cursor-default"
+              }`}
               onMouseDown={handleStopPropagation}
               onClick={handleTitleClick}
             >
@@ -329,6 +392,7 @@ const StickyNote = memo(function StickyNote({
                     handleCancelContent();
                   }
                 }}
+                onBlur={handleSaveContent}
                 onFocus={(e) => {
                   e.target.select(); // Select all text when focused
                 }}
@@ -340,7 +404,9 @@ const StickyNote = memo(function StickyNote({
               />
             ) : (
               <p
-                className="text-sm flex-1 overflow-hidden leading-relaxed cursor-text text-gray-800 font-normal"
+                className={`text-sm flex-1 overflow-hidden leading-relaxed text-gray-800 font-normal ${
+                  type === "visitor" ? "cursor-text" : "cursor-default"
+                }`}
                 onClick={handleContentClick}
                 onMouseDown={handleStopPropagation}
               >

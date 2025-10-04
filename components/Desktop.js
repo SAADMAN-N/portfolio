@@ -283,9 +283,12 @@ export default function Desktop() {
   };
 
   const handleStickyNoteUpdate = useCallback((updatedNote) => {
-    setStickyNotes((prev) =>
-      prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
-    );
+    setStickyNotes((prev) => {
+      const updated = prev.map((note) =>
+        note.id === updatedNote.id ? updatedNote : note
+      );
+      return updated;
+    });
   }, []);
 
   const handleNoteCreated = useCallback((newNote) => {
@@ -361,6 +364,10 @@ export default function Desktop() {
       return allNoteIds;
     });
   }, [stickyNotes]);
+
+  const handleDeleteStickyNote = useCallback((noteId) => {
+    setStickyNotes((prev) => prev.filter((note) => note.id !== noteId));
+  }, []);
 
   return (
     <div
@@ -463,10 +470,13 @@ export default function Desktop() {
                 isEditable={note.isEditable}
                 type={note.type}
                 author={note.author}
+                status={note.status}
+                createdAt={note.createdAt}
                 isMinimized={minimizedNotes.has(note.id)}
                 onUpdate={handleStickyNoteUpdate}
                 onMinimize={handleMinimizeNote}
                 onMinimizeAll={handleMinimizeAll}
+                onDelete={handleDeleteStickyNote}
               />
             )),
           [
@@ -475,6 +485,7 @@ export default function Desktop() {
             minimizedNotes,
             handleMinimizeNote,
             handleMinimizeAll,
+            handleDeleteStickyNote,
           ]
         )}
       </DndContext>
