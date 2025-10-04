@@ -16,12 +16,15 @@ export default function WindowDesktop({
   height,
   content,
   style,
+  isClosing = false,
 }) {
   const [selectedSidebarItem, setSelectedSidebarItem] = useState(null);
 
   return (
     <div
-      className="fixed rounded-2xl flex justify-between bg-transparent select-none border-1 border-black/6 b-rounded-sm "
+      className={`fixed rounded-2xl flex justify-between bg-transparent select-none border-1 border-black/6 b-rounded-sm transition-all duration-200 ease-in-out ${
+        isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
+      }`}
       style={{
         top: position.top,
         left: position.left,
@@ -29,6 +32,7 @@ export default function WindowDesktop({
         height: height || 600,
         zIndex: style?.zIndex || 9998,
       }}
+      onClick={(e) => e.stopPropagation()}
     >
       {/* Sidebar */}
       <div className="w-48 h-full rounded-l-2xl px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">

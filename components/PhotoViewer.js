@@ -9,10 +9,17 @@ const items = [
   },
 ];
 
-export default function PhotoViewer({ top = "50vh", left = "50vw", style }) {
+export default function PhotoViewer({
+  top = "50vh",
+  left = "50vw",
+  style,
+  isClosing = false,
+}) {
   return (
     <div
-      className="rounded-2xl"
+      className={`rounded-2xl transition-all duration-200 ease-in-out ${
+        isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
+      }`}
       style={{
         position: "fixed",
         top: top,
@@ -23,6 +30,7 @@ export default function PhotoViewer({ top = "50vh", left = "50vw", style }) {
         backgroundColor: "rgba(0, 0, 0, 0.05)", // Slight background to see the borders
         border: "1px solid rgba(0, 0, 0, 0.1)",
       }}
+      onClick={(e) => e.stopPropagation()}
     >
       <InfiniteMenu items={items} />
     </div>

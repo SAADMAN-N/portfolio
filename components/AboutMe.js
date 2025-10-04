@@ -20,16 +20,20 @@ export default function AboutMe({
   width,
   height,
   position = { top: 100, left: 100 },
+  isClosing = false,
 }) {
   return (
     <div
-      className="fixed rounded-2xl border-2 border-background bg-black/50 backdrop-blur-lg overflow-hidden select-none"
+      className={`fixed rounded-2xl border-2 border-background bg-black/50 backdrop-blur-lg overflow-hidden select-none transition-all duration-200 ease-in-out ${
+        isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
+      }`}
       style={{
         width: width,
         height: height,
         top: position.top,
         left: position.left,
       }}
+      onClick={(e) => e.stopPropagation()}
     >
       <FlickeringGrid
         className="absolute inset-0 pointer-events-none rounded-2xl"
@@ -252,13 +256,18 @@ export default function AboutMe({
             description=""
             href="#"
             background={
-              <div className="absolute inset-0 -top-20 w-[80%] flex justify-end items-center">
+              <div className="absolute inset-0 -top-20 w-[80%] pl-[20px] flex justify-start items-center">
                 <link
                   rel="stylesheet"
                   type="text/css"
                   href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
                 />
-                <AvatarGroup>
+                <AvatarGroup
+                  className="gap-1"
+                  sideOffset={10}
+                  side="bottom"
+                  alignOffset={50}
+                >
                   {skillsData.map((avatar, index) => (
                     <Avatar key={index}>
                       <AvatarImage src={avatar.src} />
@@ -267,6 +276,20 @@ export default function AboutMe({
                     </Avatar>
                   ))}
                 </AvatarGroup>
+                <Image
+                  src="/agile-icon.png"
+                  alt="agile-icon"
+                  width={300}
+                  height={300}
+                  className="absolute top-[60px] -right-[90px] rotate-[30deg]"
+                />
+                <Image
+                  src="/cicd-icon.png"
+                  alt="cicd-icon"
+                  width={150}
+                  height={150}
+                  className="absolute -bottom-[10px] left-[55px] rotate-0"
+                />
               </div>
             }
           />

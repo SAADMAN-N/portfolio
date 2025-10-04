@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 
-export default function Menubar({ onTidy }) {
+export default function Menubar({ onTidy, onCreateStickyNote }) {
   const dayDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
@@ -41,6 +41,13 @@ export default function Menubar({ onTidy }) {
         </span>
         <button className="text-gray-950 hover:underline">Resume</button>
         <button className="text-gray-950 hover:underline">Contact</button>
+        <button
+          onClick={onCreateStickyNote}
+          className="text-gray-950 hover:underline"
+        >
+          Create Sticky Note{" "}
+          <span className="text-blue-700 font-bold ml-2">{`Try it out!`}</span>
+        </button>
       </div>
 
       {/* Right side: Tidy button, Icons and Time */}
@@ -52,6 +59,7 @@ export default function Menubar({ onTidy }) {
         >
           Tidy
         </button>
+
         <span>
           <Image
             className="m-0 p-0"

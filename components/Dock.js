@@ -1,6 +1,6 @@
 import DockIcon from "./DockIcon";
 
-export default function Dock() {
+export default function Dock({ onDesktopClick }) {
   return (
     <div className="w-full flex justify-center fixed bottom-4 left-0 right-0 z-[9999] ">
       <div
@@ -11,6 +11,7 @@ export default function Dock() {
           bg-black/40
           shadow-[0_30px_30px_rgba(0,0,0,0.2)]
           p-x-[10px] p-t p-[30px] p-b-[50px]"
+        onClick={onDesktopClick}
       >
         <div className="relative">
           <DockIcon isClickable={true} icon="/finder-icon.png" />

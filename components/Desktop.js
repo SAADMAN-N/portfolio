@@ -7,19 +7,32 @@ import DesktopItem from "./DesktopItem";
 import desktopItems from "@/data/desktopItems";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 
-import { useEffect, useState } from "react";
-import { DndContext, useDraggable } from "@dnd-kit/core";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  DndContext,
+  useDraggable,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import WindowDesktop from "./WindowDesktop";
 import PhotoViewer from "./PhotoViewer";
 import AboutMe from "./AboutMe";
+import StickyNote from "./StickyNote";
 import { aboutMeWindows } from "@/data/aboutMeWindows";
+import { stickyNotesData, getApprovedNotes } from "@/data/stickyNotesData";
 
 function DraggableItem({ item, onItemClick }) {
-  const { setNodeRef, listeners, attributes, transform } = useDraggable({
-    id: item.id,
-  });
+  const { setNodeRef, listeners, attributes, transform, isDragging } =
+    useDraggable({
+      id: item.id,
+    });
+
   const dragStyle = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: isDragging ? 1000 : "auto",
+      }
     : undefined;
   const dragAttrs = { ...listeners, ...attributes };
 
@@ -60,6 +73,18 @@ export default function Desktop() {
   const [items, setItems] = useState([]);
   const [initialized, setInitialized] = useState(false);
   const [openWindows, setOpenWindows] = useState({});
+  const [closingWindows, setClosingWindows] = useState({});
+  const [stickyNotes, setStickyNotes] = useState(stickyNotesData);
+  const [minimizedNotes, setMinimizedNotes] = useState(new Set());
+
+  // Configure drag sensors for better performance
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before starting drag
+      },
+    })
+  );
 
   // One-time initialize positions: prefer saved, else top-right defaults with right-to-left stacking
   useEffect(() => {
@@ -168,22 +193,146 @@ export default function Desktop() {
 
   const handleItemClick = (item) => {
     setOpenWindows((prev) => {
-      // Close all other windows first
+      // If the clicked item is currently open, close it with animation
+      if (prev[item.id]) {
+        // Start closing animation for the clicked item
+        setClosingWindows((closingPrev) => ({
+          ...closingPrev,
+          [item.id]: true,
+        }));
+
+        // After animation completes, actually close the window
+        setTimeout(() => {
+          setOpenWindows((openPrev) => ({ ...openPrev, [item.id]: false }));
+          setClosingWindows((closingPrev) => ({
+            ...closingPrev,
+            [item.id]: false,
+          }));
+        }, 200);
+
+        return prev; // Don't change state immediately
+      }
+
+      // If the clicked item is closed, close all other windows first, then open the clicked item
       const closedAll = Object.keys(prev).reduce((acc, key) => {
         acc[key] = false;
         return acc;
       }, {});
 
-      // Then toggle the clicked item
+      // Then open the clicked item
       return {
         ...closedAll,
-        [item.id]: !prev[item.id],
+        [item.id]: true,
       };
     });
   };
 
+  const handleDesktopClick = (e) => {
+    // Don't close windows if clicking on sticky notes or their children
+    if (e.target.closest("[data-sticky-note]")) {
+      return;
+    }
+
+    // Start closing animation for all open windows
+    const currentlyOpen = Object.keys(openWindows).filter(
+      (key) => openWindows[key]
+    );
+    if (currentlyOpen.length > 0) {
+      setClosingWindows(
+        currentlyOpen.reduce((acc, key) => {
+          acc[key] = true;
+          return acc;
+        }, {})
+      );
+
+      // After animation completes, actually close the windows
+      setTimeout(() => {
+        setOpenWindows({});
+        setClosingWindows({});
+      }, 200); // Match the CSS transition duration
+    }
+  };
+
+  const handleStickyNoteUpdate = useCallback((updatedNote) => {
+    setStickyNotes((prev) =>
+      prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+    );
+  }, []);
+
+  const handleNoteCreated = useCallback((newNote) => {
+    setStickyNotes((prev) => [...prev, newNote]);
+  }, []);
+
+  const handleCreateStickyNote = useCallback(() => {
+    const colorOptions = [
+      { bg: "#FFE066", text: "#333333" },
+      { bg: "#FF6B6B", text: "#FFFFFF" },
+      { bg: "#4ECDC4", text: "#FFFFFF" },
+      { bg: "#45B7D1", text: "#FFFFFF" },
+      { bg: "#96CEB4", text: "#333333" },
+      { bg: "#FFEAA7", text: "#333333" },
+      { bg: "#DDA0DD", text: "#333333" },
+      { bg: "#98D8C8", text: "#333333" },
+    ];
+
+    const randomColor =
+      colorOptions[Math.floor(Math.random() * colorOptions.length)];
+
+    // Calculate dynamic size based on content
+    const baseWidth = 200;
+    const baseHeight = 120;
+    const contentHeight = 60; // Base height for content
+    const dynamicHeight = baseHeight + contentHeight;
+
+    const newNote = {
+      id: `sticky-note-${Date.now()}`,
+      title: "New Note",
+      content:
+        "Leave a review or feedback here! Click to edit and share your thoughts.",
+      position: {
+        top: window.innerHeight / 2 - dynamicHeight / 2,
+        left: window.innerWidth / 2 - baseWidth / 2,
+      },
+      size: { width: baseWidth, height: dynamicHeight },
+      bgColor: randomColor.bg,
+      textColor: randomColor.text,
+      isEditable: true,
+      type: "visitor",
+      author: null,
+      status: "approved",
+      createdAt: new Date().toISOString(),
+    };
+
+    setStickyNotes((prev) => [...prev, newNote]);
+  }, []);
+
+  const handleMinimizeNote = useCallback((noteId) => {
+    setMinimizedNotes((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(noteId)) {
+        newSet.delete(noteId); // Toggle off
+      } else {
+        newSet.add(noteId); // Toggle on
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleMinimizeAll = useCallback(() => {
+    setMinimizedNotes((prev) => {
+      const allNoteIds = new Set(
+        getApprovedNotes(stickyNotes).map((note) => note.id)
+      );
+      return allNoteIds;
+    });
+  }, [stickyNotes]);
+
   return (
-    <div className="desktop-wallpaper" style={{ backgroundColor: "#F5F2E8" }}>
+    <div
+      className="desktop-wallpaper desktop-background"
+      style={{ backgroundColor: "#F5F2E8" }}
+      onClick={handleDesktopClick}
+    >
       <Menubar
         onTidy={() => {
           // Clear saved positions and reapply default top-right stacking
@@ -216,9 +365,13 @@ export default function Desktop() {
             })
           );
         }}
+        onCreateStickyNote={handleCreateStickyNote}
       />
-      <Hero />
+      <Hero onDesktopClick={handleDesktopClick} />
+
+      {/* Desktop Items DndContext */}
       <DndContext
+        sensors={sensors}
         modifiers={[restrictToWindowEdges]}
         onDragEnd={({ active, delta }) => {
           setItems((prev) =>
@@ -244,6 +397,53 @@ export default function Desktop() {
         ))}
       </DndContext>
 
+      {/* Sticky Notes DndContext */}
+      <DndContext
+        sensors={sensors}
+        onDragEnd={useCallback(({ active, delta }) => {
+          setStickyNotes((prev) =>
+            prev.map((note) => {
+              if (note.id !== active.id) return note;
+              const next = {
+                top: note.position.top + delta.y,
+                left: note.position.left + delta.x,
+              };
+              return { ...note, position: next };
+            })
+          );
+        }, [])}
+      >
+        {useMemo(
+          () =>
+            getApprovedNotes(stickyNotes).map((note) => (
+              <StickyNote
+                key={note.id}
+                id={note.id}
+                title={note.title}
+                content={note.content}
+                position={note.position}
+                size={note.size}
+                bgColor={note.bgColor}
+                textColor={note.textColor}
+                isEditable={note.isEditable}
+                type={note.type}
+                author={note.author}
+                isMinimized={minimizedNotes.has(note.id)}
+                onUpdate={handleStickyNoteUpdate}
+                onMinimize={handleMinimizeNote}
+                onMinimizeAll={handleMinimizeAll}
+              />
+            )),
+          [
+            stickyNotes,
+            handleStickyNoteUpdate,
+            minimizedNotes,
+            handleMinimizeNote,
+            handleMinimizeAll,
+          ]
+        )}
+      </DndContext>
+
       {/* Desktop Windows - outside DndContext */}
       {desktopItems.map((item) => {
         if (!openWindows[item.id]) return null;
@@ -259,6 +459,7 @@ export default function Desktop() {
                   top={`${windowPreset.position.top}px`}
                   left={`${windowPreset.position.left}px`}
                   style={{ zIndex: 99 + index }}
+                  isClosing={closingWindows[item.id]}
                 />
               );
             }
@@ -272,6 +473,7 @@ export default function Desktop() {
                   height={windowPreset.size.height}
                   position={windowPreset.position}
                   style={{ zIndex: 99 + index }}
+                  isClosing={closingWindows[item.id]}
                 />
               );
             }
@@ -291,6 +493,7 @@ export default function Desktop() {
                   setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
                 }
                 style={{ zIndex: 99 + index }}
+                isClosing={closingWindows[item.id]}
               />
             );
           });
@@ -307,11 +510,12 @@ export default function Desktop() {
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
             }
+            isClosing={closingWindows[item.id]}
           />
         );
       })}
 
-      <Dock />
+      <Dock onDesktopClick={handleDesktopClick} />
     </div>
   );
 }

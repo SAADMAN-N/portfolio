@@ -5,6 +5,11 @@ export const frameworkData = [
     tooltip: "Next.js",
   },
   {
+    src: "https://devicon-website.vercel.app/api/tailwindcss/plain.svg",
+    fallback: "Tailwind CSS",
+    tooltip: "Tailwind CSS",
+  },
+  {
     src: "https://devicon-website.vercel.app/api/flask/original.svg?color=%23FFFFFF",
     fallback: "Flask",
     tooltip: "Flask",

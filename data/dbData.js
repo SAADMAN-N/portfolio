@@ -9,4 +9,9 @@ export const dbData = [
     fallback: "MySQL",
     tooltip: "MySQL",
   },
+  {
+    src: "https://devicon-website.vercel.app/api/mongodb/original.svg",
+    fallback: "MongoDB",
+    tooltip: "MongoDB",
+  },
 ];

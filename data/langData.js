@@ -1,9 +1,4 @@
 export const langData = [
-  {
-    src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg",
-    fallback: "React 19+",
-    tooltip: "React",
-  },
   // swapping out shadcn for tailwind (and the rest as requested)
 
   {
@@ -36,8 +31,11 @@ export const langData = [
 
   // Next.js
   // (Considered using the "plain" icon, but sticking with the "original" for consistency.)
-
-  // TypeScript
+  {
+    src: "https://devicon-website.vercel.app/api/javascript/plain.svg",
+    fallback: "JS",
+    tooltip: "JavaScript",
+  }, // TypeScript
   // (Tried the "plain" icon, but the "original" one pops more.)
   {
     src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
