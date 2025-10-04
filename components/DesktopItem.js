@@ -19,6 +19,7 @@ export default function DesktopItem({
         top: position.top,
         left: position.left,
         width: 64,
+        willChange: dragStyle ? "transform" : "auto",
         ...(dragStyle || {}),
       }}
       onClick={(e) => {

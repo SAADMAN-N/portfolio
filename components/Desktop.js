@@ -32,6 +32,7 @@ function DraggableItem({ item, onItemClick }) {
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         zIndex: isDragging ? 1000 : "auto",
+        willChange: "transform",
       }
     : undefined;
   const dragAttrs = { ...listeners, ...attributes };

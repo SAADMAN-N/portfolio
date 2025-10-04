@@ -5,7 +5,7 @@ export const stickyNotesData = [
     content:
       "This is a sticky note! Click to edit, drag to move around. You can create more notes in the data file.",
     position: { top: 150, left: 200 },
-    size: { width: 200, height: 150 },
+    size: { width: 250, height: 180 },
     bgColor: "#FFE066",
     textColor: "#333333",
     isEditable: true,
@@ -20,7 +20,7 @@ export const stickyNotesData = [
     content:
       "• Fix portfolio animations\n• Add more projects\n• Update resume\n• Practice coding",
     position: { top: 320, left: 100 },
-    size: { width: 180, height: 120 },
+    size: { width: 220, height: 160 },
     bgColor: "#FF6B6B",
     textColor: "#FFFFFF",
     isEditable: true,
@@ -35,7 +35,7 @@ export const stickyNotesData = [
     content:
       "• Dark mode toggle\n• Custom themes\n• Note categories\n• Export notes",
     position: { top: 100, left: 400 },
-    size: { width: 160, height: 140 },
+    size: { width: 200, height: 150 },
     bgColor: "#4ECDC4",
     textColor: "#FFFFFF",
     isEditable: true,
@@ -53,7 +53,7 @@ export const addStickyNote = (notes, newNote) => {
     title: "New Note",
     content: "Click to edit...",
     position: { top: 100, left: 100 },
-    size: { width: 200, height: 150 },
+    size: { width: 250, height: 180 },
     bgColor: "#FFE066",
     textColor: "#333333",
     isEditable: true,
