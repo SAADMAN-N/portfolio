@@ -17,7 +17,7 @@ export default function PhotoViewer({
 }) {
   return (
     <div
-      className={`rounded-2xl transition-all duration-200 ease-in-out ${
+      className={`rounded-2xl transition-all duration-200 ease-in-out z-[10000] ${
         isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
       }`}
       style={{

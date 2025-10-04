@@ -4,7 +4,7 @@ export const stickyNotesData = [
     title: "Welcome!",
     content:
       "This is a sticky note! Click to edit, drag to move around. You can create more notes in the data file.",
-    position: { top: 150, left: 200 },
+    position: { top: 100, left: 100 },
     size: { width: 250, height: 180 },
     bgColor: "#FFE066",
     textColor: "#333333",
@@ -19,8 +19,8 @@ export const stickyNotesData = [
     title: "Todo List",
     content:
       "• Fix portfolio animations\n• Add more projects\n• Update resume\n• Practice coding",
-    position: { top: 320, left: 100 },
-    size: { width: 220, height: 160 },
+    position: { top: 250, left: 150 },
+    size: { width: 220, height: 300 },
     bgColor: "#FF6B6B",
     textColor: "#FFFFFF",
     isEditable: true,
@@ -34,7 +34,7 @@ export const stickyNotesData = [
     title: "Ideas",
     content:
       "• Dark mode toggle\n• Custom themes\n• Note categories\n• Export notes",
-    position: { top: 100, left: 400 },
+    position: { top: 90, left: 400 },
     size: { width: 200, height: 150 },
     bgColor: "#4ECDC4",
     textColor: "#FFFFFF",

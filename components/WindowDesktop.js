@@ -22,7 +22,7 @@ export default function WindowDesktop({
 
   return (
     <div
-      className={`fixed rounded-2xl flex justify-between bg-transparent select-none border-1 border-black/6 b-rounded-sm transition-all duration-200 ease-in-out ${
+      className={`fixed rounded-2xl flex justify-between bg-transparent select-none border-1 border-black/6 b-rounded-sm transition-all duration-200 ease-in-out z-[10000] ${
         isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
       }`}
       style={{

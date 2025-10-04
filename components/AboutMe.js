@@ -24,7 +24,7 @@ export default function AboutMe({
 }) {
   return (
     <div
-      className={`fixed rounded-2xl border-2 border-background bg-black/50 backdrop-blur-lg overflow-hidden select-none transition-all duration-200 ease-in-out ${
+      className={`fixed rounded-2xl bg-black/50 backdrop-blur-lg overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] ${
         isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
       }`}
       style={{

@@ -292,10 +292,10 @@ const StickyNote = memo(function StickyNote({
       data-sticky-note={id}
       className={`absolute select-none rounded-lg border border-gray-300/30 flex flex-col overflow-hidden [border-radius:0.5rem] ${
         isDragging
-          ? "z-50 scale-105 shadow-2xl"
+          ? "z-20 scale-105 shadow-2xl"
           : isMinimized
-            ? "z-40 hover:scale-102 transition-all duration-200 shadow-none [box-shadow:none!important]"
-            : "z-40 shadow-lg hover:shadow-xl hover:scale-102 transition-all duration-200"
+            ? "z-10 hover:scale-102 transition-all duration-200 shadow-none [box-shadow:none!important]"
+            : "z-10 shadow-lg hover:shadow-xl hover:scale-102 transition-all duration-200"
       }`}
       style={{
         top: position.top,

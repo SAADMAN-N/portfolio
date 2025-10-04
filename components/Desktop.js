@@ -18,6 +18,7 @@ import {
 import WindowDesktop from "./WindowDesktop";
 import PhotoViewer from "./PhotoViewer";
 import AboutMe from "./AboutMe";
+import Reminders from "./Reminders";
 import StickyNote from "./StickyNote";
 import { aboutMeWindows } from "@/data/aboutMeWindows";
 import { stickyNotesData, getApprovedNotes } from "@/data/stickyNotesData";
@@ -77,6 +78,7 @@ export default function Desktop() {
   const [closingWindows, setClosingWindows] = useState({});
   const [stickyNotes, setStickyNotes] = useState([]);
   const [minimizedNotes, setMinimizedNotes] = useState(new Set());
+  const [isRemindersMinimized, setIsRemindersMinimized] = useState(false);
 
   // Configure drag sensors for better performance
   const sensors = useSensors(
@@ -365,6 +367,10 @@ export default function Desktop() {
     });
   }, [stickyNotes]);
 
+  const handleRemindersMinimize = useCallback(() => {
+    setIsRemindersMinimized((prev) => !prev);
+  }, []);
+
   const handleDeleteStickyNote = useCallback((noteId) => {
     setStickyNotes((prev) => prev.filter((note) => note.id !== noteId));
   }, []);
@@ -490,7 +496,68 @@ export default function Desktop() {
         )}
       </DndContext>
 
-      {/* Desktop Windows - outside DndContext */}
+      {/* Sticky Notes - rendered before desktop windows for proper layering */}
+      <DndContext
+        sensors={sensors}
+        onDragEnd={useCallback(({ active, delta }) => {
+          setStickyNotes((prev) =>
+            prev.map((note) => {
+              if (note.id !== active.id) return note;
+              const next = {
+                ...note,
+                position: {
+                  top: note.position.top + delta.y,
+                  left: note.position.left + delta.x,
+                },
+              };
+              return { ...note, position: next };
+            })
+          );
+        }, [])}
+      >
+        {useMemo(
+          () =>
+            getApprovedNotes(stickyNotes).map((note) => (
+              <StickyNote
+                key={note.id}
+                id={note.id}
+                title={note.title}
+                content={note.content}
+                position={note.position}
+                size={note.size}
+                bgColor={note.bgColor}
+                textColor={note.textColor}
+                isEditable={note.isEditable}
+                type={note.type}
+                author={note.author}
+                status={note.status}
+                createdAt={note.createdAt}
+                isMinimized={minimizedNotes.has(note.id)}
+                onUpdate={handleStickyNoteUpdate}
+                onMinimize={handleMinimizeNote}
+                onMinimizeAll={handleMinimizeAll}
+                onDelete={handleDeleteStickyNote}
+              />
+            )),
+          [
+            stickyNotes,
+            handleStickyNoteUpdate,
+            minimizedNotes,
+            handleMinimizeNote,
+            handleMinimizeAll,
+            handleDeleteStickyNote,
+          ]
+        )}
+      </DndContext>
+
+      {/* Reminders Component - rendered before desktop windows */}
+      <Reminders
+        position={{ top: 250, left: 400 }}
+        isMinimized={isRemindersMinimized}
+        onMinimize={handleRemindersMinimize}
+      />
+
+      {/* Desktop Windows - rendered after notes for proper layering */}
       {desktopItems.map((item) => {
         if (!openWindows[item.id]) return null;
 
@@ -504,7 +571,7 @@ export default function Desktop() {
                   key={`${item.id}-photo-viewer`}
                   top={`${windowPreset.position.top}px`}
                   left={`${windowPreset.position.left}px`}
-                  style={{ zIndex: 99 + index }}
+                  style={{}}
                   isClosing={closingWindows[item.id]}
                 />
               );
@@ -518,7 +585,7 @@ export default function Desktop() {
                   width={windowPreset.size.width}
                   height={windowPreset.size.height}
                   position={windowPreset.position}
-                  style={{ zIndex: 99 + index }}
+                  style={{}}
                   isClosing={closingWindows[item.id]}
                 />
               );
@@ -538,7 +605,7 @@ export default function Desktop() {
                 onClose={() =>
                   setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
                 }
-                style={{ zIndex: 99 + index }}
+                style={{ zIndex: 1000 + index }}
                 isClosing={closingWindows[item.id]}
               />
             );
@@ -556,6 +623,7 @@ export default function Desktop() {
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
             }
+            style={{}}
             isClosing={closingWindows[item.id]}
           />
         );

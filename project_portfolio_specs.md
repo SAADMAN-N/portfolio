@@ -10,9 +10,9 @@
 
 ### **Component Architecture**
 
-- **Total Components**: 25+ React components
+- **Total Components**: 26+ React components
 - **UI Components**: 12 custom UI components
-- **Data Files**: 12 structured data files
+- **Data Files**: 13 structured data files
 - **Public Assets**: 50+ icons and images
 - **Animation Libraries**: 4 different animation systems
 - **Performance Optimizations**: 15+ optimization techniques
@@ -25,12 +25,12 @@
 
 ```
 portfolio-mac/
-├── components/ (25 files)
-│   ├── Core Desktop Components (6)
+├── components/ (26 files)
+│   ├── Core Desktop Components (7)
 │   ├── UI Components (12)
 │   ├── Animation Primitives (3)
 │   └── Utility Components (4)
-├── data/ (12 files)
+├── data/ (13 files)
 ├── hooks/ (2 files)
 ├── lib/ (2 files)
 └── public/ (50+ assets)
@@ -54,29 +54,33 @@ portfolio-mac/
    - Link preview integration
    - Responsive layout system
 
-3. **StickyNote.js** (381 lines) - Interactive notes system
+3. **StickyNote.js** (447 lines) - Interactive notes system
    - Inline editing (title/content)
    - Drag & drop functionality with header-only dragging
    - Resize functionality with corner handle
    - Minimize system (individual/all)
    - Two note types (permanent/visitor)
-   - Real-time state management
-   - macOS-style window controls
-   - Optimized event handling (8+ useCallback functions)
 
-4. **AboutMe.js** (338 lines) - Bento grid showcase
+4. **Reminders.js** (140 lines) - Decorative todo display
+   - Static checklist format with macOS styling
+   - Circular checkboxes with completion states
+   - Dark theme matching official macOS Reminders app
+   - Minimize functionality with window controls
+   - Sample daily routine todos for portfolio context
+
+5. **AboutMe.js** (338 lines) - Bento grid showcase
    - 6 different skill categories
    - Avatar group animations
    - Dynamic content rendering
    - Responsive grid layout
 
-5. **MenuBar.js** (99 lines) - macOS-style menubar
+6. **MenuBar.js** (99 lines) - macOS-style menubar
    - Real-time date/time display
    - Navigation links
    - Sticky note creation trigger
    - System-style icons
 
-6. **Dock.js** (85 lines) - Application dock
+7. **Dock.js** (85 lines) - Application dock
    - 15+ application icons
    - Hover animations
    - macOS-style design
@@ -248,6 +252,17 @@ portfolio-mac/
 - **Dynamic Sizing** - Content-based dimensions with localStorage persistence
 - **Two Types** - Permanent (coded) vs Visitor (user-created)
 - **Border Optimization** - Perfect corner alignment with overflow-hidden
+
+### **Reminders Component**
+
+- **Decorative Display** - Static todo list showing daily routine and work habits
+- **macOS Native Styling** - Dark theme matching official macOS Reminders app
+- **Checklist Format** - Circular checkboxes with completed state visualization
+- **Window Controls** - Red close and yellow minimize buttons
+- **Fixed Position** - No drag/resize functionality for simplicity
+- **Sample Data** - 8 realistic todo items with mixed completion states
+- **Hover Effects** - Subtle interactions for visual feedback
+- **Minimize Support** - Can be minimized to title bar only
 - **Event Separation** - Complete separation of drag, resize, and edit functionalities
 
 ### **Animation System**
