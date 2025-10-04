@@ -74,7 +74,7 @@ export default function Desktop() {
   const [initialized, setInitialized] = useState(false);
   const [openWindows, setOpenWindows] = useState({});
   const [closingWindows, setClosingWindows] = useState({});
-  const [stickyNotes, setStickyNotes] = useState(stickyNotesData);
+  const [stickyNotes, setStickyNotes] = useState([]);
   const [minimizedNotes, setMinimizedNotes] = useState(new Set());
 
   // Configure drag sensors for better performance
@@ -85,6 +85,34 @@ export default function Desktop() {
       },
     })
   );
+
+  // Load sticky notes from localStorage on component mount
+  useEffect(() => {
+    try {
+      const savedNotes = localStorage.getItem("stickyNotes");
+      if (savedNotes) {
+        const parsedNotes = JSON.parse(savedNotes);
+        setStickyNotes(parsedNotes);
+      } else {
+        // If no saved notes, use default data
+        setStickyNotes(stickyNotesData);
+      }
+    } catch (e) {
+      console.warn("Failed to load sticky notes:", e);
+      setStickyNotes(stickyNotesData);
+    }
+  }, []);
+
+  // Save sticky notes to localStorage whenever they change
+  useEffect(() => {
+    if (stickyNotes.length > 0) {
+      try {
+        localStorage.setItem("stickyNotes", JSON.stringify(stickyNotes));
+      } catch (e) {
+        console.warn("Failed to save sticky notes:", e);
+      }
+    }
+  }, [stickyNotes]);
 
   // One-time initialize positions: prefer saved, else top-right defaults with right-to-left stacking
   useEffect(() => {
@@ -304,6 +332,12 @@ export default function Desktop() {
     };
 
     setStickyNotes((prev) => [...prev, newNote]);
+  }, []);
+
+  // Helper function to clear sticky notes (for testing)
+  const clearStickyNotes = useCallback(() => {
+    localStorage.removeItem("stickyNotes");
+    setStickyNotes(stickyNotesData);
   }, []);
 
   const handleMinimizeNote = useCallback((noteId) => {

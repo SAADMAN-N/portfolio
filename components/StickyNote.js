@@ -142,7 +142,7 @@ const StickyNote = memo(function StickyNote({
       }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-2 border-b border-black/10">
+      <div className="flex items-center justify-between p-2 border-b border-black/20">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {/* Minimize button (yellow) */}
           <button
@@ -150,7 +150,7 @@ const StickyNote = memo(function StickyNote({
               e.stopPropagation();
               if (onMinimize) onMinimize(id);
             }}
-            className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 transition-colors flex-shrink-0"
+            className="w-3 h-3 rounded-full bg-yellow-400 hover:bg-yellow-500 transition-colors flex-shrink-0 border border-black/20 shadow-sm"
             title="Minimize"
           />
           {/* Minimize all button (red) */}
@@ -159,7 +159,7 @@ const StickyNote = memo(function StickyNote({
               e.stopPropagation();
               if (onMinimizeAll) onMinimizeAll();
             }}
-            className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 transition-colors flex-shrink-0"
+            className="w-3 h-3 rounded-full bg-red-400 hover:bg-red-500 transition-colors flex-shrink-0 border border-black/20 shadow-sm"
             title="Minimize All"
           />
           {/* Title - especially important when minimized */}
