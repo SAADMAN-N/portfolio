@@ -276,19 +276,19 @@ export default function AboutMe({
                     </Avatar>
                   ))}
                 </AvatarGroup>
-                <Image
+                {/* <Image
                   src="/agile-icon.png"
                   alt="agile-icon"
                   width={300}
                   height={300}
                   className="absolute top-[60px] -right-[90px] rotate-[30deg]"
-                />
+                /> */}
                 <Image
                   src="/cicd-icon.png"
                   alt="cicd-icon"
                   width={150}
                   height={150}
-                  className="absolute -bottom-[10px] left-[55px] rotate-0"
+                  className="absolute -bottom-[5px] -right-[50px] rotate-[20deg]"
                 />
               </div>
             }

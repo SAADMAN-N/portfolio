@@ -62,6 +62,7 @@ const StickyNote = memo(function StickyNote({
       id: id,
     });
 
+  // Use transform for smooth visual feedback during drag
   const dragStyle =
     transform && !isResizing
       ? {
@@ -69,6 +70,11 @@ const StickyNote = memo(function StickyNote({
           zIndex: isDragging ? 1000 : "auto",
         }
       : undefined;
+
+  // Debug logging
+  if (isDragging) {
+    console.log(`Dragging ${id}, transform:`, transform, "position:", position);
+  }
 
   const handleSaveTitle = useCallback(() => {
     setIsEditingTitle(false);
@@ -283,19 +289,31 @@ const StickyNote = memo(function StickyNote({
     [type, onDelete, id]
   );
 
+  console.log(
+    `Rendering StickyNote ${id} at position:`,
+    position,
+    "size:",
+    currentSize,
+    "minimized:",
+    isMinimized
+  );
+
   return (
     <div
       ref={(node) => {
         setNodeRef(node);
         noteRef.current = node;
+        if (node) {
+          console.log(`StickyNote ${id} DOM element created:`, node);
+        }
       }}
       data-sticky-note={id}
       className={`absolute select-none rounded-lg border border-gray-300/30 flex flex-col overflow-hidden [border-radius:0.5rem] ${
         isDragging
           ? "z-20 scale-105 shadow-2xl"
           : isMinimized
-            ? "z-10 hover:scale-102 transition-all duration-200 shadow-none [box-shadow:none!important]"
-            : "z-10 shadow-lg hover:shadow-xl hover:scale-102 transition-all duration-200"
+            ? "z-50 hover:scale-102 transition-all duration-200 shadow-none [box-shadow:none!important]"
+            : "z-50 shadow-lg hover:shadow-xl hover:scale-102 transition-all duration-200"
       }`}
       style={{
         top: position.top,

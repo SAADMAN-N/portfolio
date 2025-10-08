@@ -4,7 +4,7 @@ export const stickyNotesData = [
     title: "Welcome!",
     content:
       "This is a sticky note! Click to edit, drag to move around. You can create more notes in the data file.",
-    position: { top: 100, left: 100 },
+    position: { top: 50, left: 100 },
     size: { width: 250, height: 180 },
     bgColor: "#FFE066",
     textColor: "#333333",
@@ -13,13 +13,18 @@ export const stickyNotesData = [
     author: null,
     status: "approved",
     createdAt: "2024-01-01T00:00:00.000Z",
+    whitespace: "preline",
   },
   {
     id: "sticky-note-2",
     title: "Todo List",
-    content:
-      "• Fix portfolio animations\n• Add more projects\n• Update resume\n• Practice coding",
-    position: { top: 250, left: 150 },
+    content: [
+      "• Fix portfolio animations",
+      "• Add more projects",
+      "• Update resume",
+      "• Practice coding",
+    ].join("\n"),
+    position: { top: 250, left: 500 },
     size: { width: 220, height: 300 },
     bgColor: "#FF6B6B",
     textColor: "#FFFFFF",
@@ -28,6 +33,7 @@ export const stickyNotesData = [
     author: null,
     status: "approved",
     createdAt: "2024-01-01T00:00:00.000Z",
+    whitespace: "pre-line",
   },
   {
     id: "sticky-note-3",

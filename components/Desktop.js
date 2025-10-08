@@ -93,11 +93,14 @@ export default function Desktop() {
   useEffect(() => {
     try {
       const savedNotes = localStorage.getItem("stickyNotes");
+      console.log("Loading sticky notes from localStorage:", savedNotes);
       if (savedNotes) {
         const parsedNotes = JSON.parse(savedNotes);
+        console.log("Parsed notes:", parsedNotes);
         setStickyNotes(parsedNotes);
       } else {
         // If no saved notes, use default data
+        console.log("No saved notes, using default data:", stickyNotesData);
         setStickyNotes(stickyNotesData);
       }
     } catch (e) {
@@ -203,7 +206,7 @@ export default function Desktop() {
 
   function snapToGrid(pos) {
     const round = (n) => Math.round(n / GRID) * GRID;
-    return { top: round(pos.top), left: round(pos.left) };
+    return { top: pos.top, left: pos.left };
   }
 
   // Re-clamp and snap all icons on window resize
@@ -415,7 +418,6 @@ export default function Desktop() {
         }}
         onCreateStickyNote={handleCreateStickyNote}
       />
-      <Hero onDesktopClick={handleDesktopClick} />
 
       {/* Desktop Items DndContext */}
       <DndContext
@@ -449,6 +451,7 @@ export default function Desktop() {
       <DndContext
         sensors={sensors}
         onDragEnd={useCallback(({ active, delta }) => {
+          console.log("Drag ended for:", active.id, "delta:", delta);
           setStickyNotes((prev) =>
             prev.map((note) => {
               if (note.id !== active.id) return note;
@@ -456,103 +459,64 @@ export default function Desktop() {
                 top: note.position.top + delta.y,
                 left: note.position.left + delta.x,
               };
+              console.log(
+                "Updating position for",
+                note.id,
+                "from",
+                note.position,
+                "to",
+                next
+              );
               return { ...note, position: next };
             })
           );
         }, [])}
       >
-        {useMemo(
-          () =>
-            getApprovedNotes(stickyNotes).map((note) => (
-              <StickyNote
-                key={note.id}
-                id={note.id}
-                title={note.title}
-                content={note.content}
-                position={note.position}
-                size={note.size}
-                bgColor={note.bgColor}
-                textColor={note.textColor}
-                isEditable={note.isEditable}
-                type={note.type}
-                author={note.author}
-                status={note.status}
-                createdAt={note.createdAt}
-                isMinimized={minimizedNotes.has(note.id)}
-                onUpdate={handleStickyNoteUpdate}
-                onMinimize={handleMinimizeNote}
-                onMinimizeAll={handleMinimizeAll}
-                onDelete={handleDeleteStickyNote}
-              />
-            )),
-          [
-            stickyNotes,
-            handleStickyNoteUpdate,
-            minimizedNotes,
-            handleMinimizeNote,
-            handleMinimizeAll,
-            handleDeleteStickyNote,
-          ]
-        )}
+        {useMemo(() => {
+          const approvedNotes = getApprovedNotes(stickyNotes);
+          console.log(
+            "Rendering sticky notes (first DnD context):",
+            approvedNotes.length,
+            approvedNotes
+          );
+          return approvedNotes.map((note) => (
+            <StickyNote
+              key={note.id}
+              id={note.id}
+              title={note.title}
+              content={note.content}
+              position={note.position}
+              size={note.size}
+              bgColor={note.bgColor}
+              textColor={note.textColor}
+              isEditable={note.isEditable}
+              type={note.type}
+              author={note.author}
+              status={note.status}
+              createdAt={note.createdAt}
+              isMinimized={minimizedNotes.has(note.id)}
+              onUpdate={handleStickyNoteUpdate}
+              onMinimize={handleMinimizeNote}
+              onMinimizeAll={handleMinimizeAll}
+              onDelete={handleDeleteStickyNote}
+            />
+          ));
+        }, [
+          stickyNotes,
+          handleStickyNoteUpdate,
+          minimizedNotes,
+          handleMinimizeNote,
+          handleMinimizeAll,
+          handleDeleteStickyNote,
+        ])}
       </DndContext>
 
-      {/* Sticky Notes - rendered before desktop windows for proper layering */}
-      <DndContext
-        sensors={sensors}
-        onDragEnd={useCallback(({ active, delta }) => {
-          setStickyNotes((prev) =>
-            prev.map((note) => {
-              if (note.id !== active.id) return note;
-              const next = {
-                ...note,
-                position: {
-                  top: note.position.top + delta.y,
-                  left: note.position.left + delta.x,
-                },
-              };
-              return { ...note, position: next };
-            })
-          );
-        }, [])}
-      >
-        {useMemo(
-          () =>
-            getApprovedNotes(stickyNotes).map((note) => (
-              <StickyNote
-                key={note.id}
-                id={note.id}
-                title={note.title}
-                content={note.content}
-                position={note.position}
-                size={note.size}
-                bgColor={note.bgColor}
-                textColor={note.textColor}
-                isEditable={note.isEditable}
-                type={note.type}
-                author={note.author}
-                status={note.status}
-                createdAt={note.createdAt}
-                isMinimized={minimizedNotes.has(note.id)}
-                onUpdate={handleStickyNoteUpdate}
-                onMinimize={handleMinimizeNote}
-                onMinimizeAll={handleMinimizeAll}
-                onDelete={handleDeleteStickyNote}
-              />
-            )),
-          [
-            stickyNotes,
-            handleStickyNoteUpdate,
-            minimizedNotes,
-            handleMinimizeNote,
-            handleMinimizeAll,
-            handleDeleteStickyNote,
-          ]
-        )}
-      </DndContext>
+      {/* Hero Component - rendered after sticky notes */}
+      <Hero onDesktopClick={handleDesktopClick} />
 
       {/* Reminders Component - rendered before desktop windows */}
       <Reminders
-        position={{ top: 250, left: 400 }}
+        position={{ top: 250, left: 100 }}
         isMinimized={isRemindersMinimized}
         onMinimize={handleRemindersMinimize}
       />
