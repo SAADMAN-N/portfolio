@@ -3,9 +3,8 @@
 import { projectsData } from "@/data/projectsData";
 import { getContent } from "@/data/contentData";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LinkPreview } from "@/components/ui/link-preview";
-import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 
 export default function WindowDesktop({
   title,
@@ -21,62 +20,73 @@ export default function WindowDesktop({
 }) {
   const [selectedProject, setSelectedProject] = useState(null);
 
-  // Function to render project-specific bento grid layouts
-  const renderProjectBentoGrid = (project) => {
-    switch (project.id) {
-      case 1: // Portfolio Website - Apple-style layout with varied sizes
-        return (
-          <BentoGrid className="grid-cols-4 grid-rows-4 h-full w-full">
-            <BentoCard className="col-span-2 row-span-2" />
-            <BentoCard className="col-span-2 row-span-1" />
-            <BentoCard className="col-span-2 row-span-3" />
-            <BentoCard className="col-span-2 row-span-2" />
-          </BentoGrid>
-        );
-
-      case 2: // E-Commerce Platform - Compact grid layout
-        return (
-          <BentoGrid className="grid-cols-4 grid-rows-4 h-full w-full">
-            <BentoCard className="col-span-4 row-span-1" />
-            <BentoCard className="col-span-2 row-span-1" />
-            <BentoCard className="col-span-2 row-span-2" />
-            <BentoCard className="col-span-2 row-span-2" />
-            <BentoCard className="col-span-2 row-span-1" />
-          </BentoGrid>
-        );
-
-      case 3: // Task Management App - Wide layout with emphasis
-        return (
-          <BentoGrid className="grid-cols-4 grid-rows-4 h-full w-full">
-            <BentoCard className="col-span-2 row-span-1" />
-            <BentoCard className="col-span-2 row-span-2" />
-            <BentoCard className="col-span-2 row-span-3" />
-            <BentoCard className="col-span-2 row-span-2" />
-          </BentoGrid>
-        );
-
-      case 4: // Weather Dashboard - Balanced layout
-        return (
-          <BentoGrid className="grid-cols-4 grid-rows-4 h-full w-full">
-            <BentoCard className="col-span-2 row-span-1" />
-            <BentoCard className="col-span-2 row-span-3" />
-            <BentoCard className="col-span-2 row-span-2" />
-            <BentoCard className="col-span-4 row-span-1" />
-          </BentoGrid>
-        );
-
-      default:
-        return (
-          <div className="flex items-center justify-center h-full text-[#8e8e93]">
-            <p>Select a project to view details</p>
-          </div>
-        );
+  // Auto-select first project when component mounts
+  useEffect(() => {
+    if (projectsData.length > 0 && !selectedProject) {
+      setSelectedProject(projectsData[0]);
     }
+  }, []);
+
+  // Function to render project details
+  const renderProjectDetails = (project) => {
+    return (
+      <div className="space-y-6">
+        {/* Project Header */}
+        <div className="border-b border-[#2c2c2e] pb-4">
+          <h2 className="text-2xl font-bold text-[#f2f2f7] mb-2">
+            {project.title}
+          </h2>
+          <p className="text-[#8e8e93]">{project.bio}</p>
+        </div>
+
+        {/* Project Image + Tech Stack */}
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[#e5e5ea]">
+              Project Screenshot
+            </h3>
+            <div className="relative rounded-lg overflow-hidden bg-[#2c2c2e] h-48 flex items-center justify-center">
+              <span className="text-[#8e8e93]">Screenshot placeholder</span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[#e5e5ea]">Tech Stack</h3>
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.map((tech, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-[#2997FF] text-white rounded-full text-sm"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky Note */}
+        <div className="bg-[#FFE066] rounded-lg p-4 text-[#333333]">
+          <h4 className="font-semibold mb-2">📝 What I Learned</h4>
+          <p className="text-sm">Challenge and learning placeholder text...</p>
+        </div>
+
+        {/* Action Links */}
+        <div className="flex gap-4">
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#2c2c2e] rounded-lg hover:bg-[#3c3c3e] transition-colors">
+            <span>GitHub</span>
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-[#2997FF] rounded-lg hover:bg-[#1a7ae6] transition-colors">
+            <span>Live Demo</span>
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
     <div
-      className={`fixed rounded-2xl flex justify-between bg-transparent select-none border-1 border-black/6 b-rounded-sm transition-all duration-200 ease-in-out z-[10000] ${
+      className={`fixed rounded-lg flex justify-between bg-transparent select-none border-1 border-black/6 transition-all duration-200 ease-in-out z-[10000] ${
         isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
       }`}
       style={{
@@ -89,8 +99,8 @@ export default function WindowDesktop({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Sidebar */}
-      <div className="w-fit min-w-48 h-full rounded-l-2xl px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">
-        <div className="flex h-10 rounded-tl-2xl p-3 gap-2 items-center">
+      <div className="w-fit min-w-48 h-full rounded-l-lg px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">
+        <div className="flex h-10 rounded-tl-lg p-3 gap-2 items-center">
           <div
             className="relative group cursor-pointer w-[12px] h-[12px]"
             onClick={onClose}
@@ -123,7 +133,7 @@ export default function WindowDesktop({
           </div>
         </div>
 
-        <div className="flex flex-col rounded-bl-2xl justify-between">
+        <div className="flex flex-col rounded-bl-lg justify-between">
           <div className=" w-full flex flex-col pt-6 gap-3">
             <div className="text-[11px] tracking-wide pl-4 uppercase text-[#8e8e93]">
               Projects
@@ -161,7 +171,7 @@ export default function WindowDesktop({
       {/* Right pane */}
       <div className="flex flex-col w-full justify-between items-center">
         {/* Toolbar/Header */}
-        <div className="w-full h-16 rounded-tr-2xl p-0 m-0 pt-4 pl-10 bg-[#2c2c2e] border-b border-[#2c2c2e]">
+        <div className="w-full h-16 rounded-tr-lg p-0 m-0 pt-4 pl-10 bg-[#2c2c2e] border-b border-[#2c2c2e]">
           <div className="text-[14px] font-medium text-[#f2f2f7]">
             {selectedProject ? selectedProject.title : title}
           </div>
@@ -171,10 +181,10 @@ export default function WindowDesktop({
         </div>
 
         {/* Content area */}
-        <div className="w-full h-full rounded-br-2xl p-6 bg-[#363636] text-[#d1d1d6] overflow-y-auto">
+        <div className="w-full h-full rounded-br-lg p-6 bg-[#363636] text-[#d1d1d6] overflow-y-auto">
           {selectedProject ? (
-            // Show project-specific bento grid when a project is selected
-            renderProjectBentoGrid(selectedProject)
+            // Show project details when a project is selected
+            renderProjectDetails(selectedProject)
           ) : (
             // Show default content when no project is selected
             <div className="flex flex-wrap gap-6">

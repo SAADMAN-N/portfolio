@@ -581,9 +581,14 @@ export default function Desktop() {
           <WindowDesktop
             key={item.id}
             title={item.label}
-            position={{ top: 100, left: 100 }}
+            position={{
+              top: 100,
+              left: `calc(50vw - 40vw)`, // Center horizontally (50vw - half of 80vw)
+            }}
             bio={item.bio}
             desktopItem={item}
+            width="80vw" // Set width to 80% of viewport
+            height="80vh" // Set height to 80% of viewport
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
             }

@@ -77,7 +77,6 @@ export default function Menubar({ onTidy, onCreateStickyNote }) {
           width={16}
           height={16}
         />
-        <span></span>
         <span>
           <Image
             className="m-0 p-0"
