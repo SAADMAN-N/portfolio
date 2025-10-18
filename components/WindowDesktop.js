@@ -5,6 +5,7 @@ import { getContent } from "@/data/contentData";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { LinkPreview } from "@/components/ui/link-preview";
+import StickyNote from "@/components/StickyNote";
 
 export default function WindowDesktop({
   title,
@@ -19,6 +20,11 @@ export default function WindowDesktop({
   isClosing = false,
 }) {
   const [selectedProject, setSelectedProject] = useState(null);
+  const [isLearningNoteMinimized, setIsLearningNoteMinimized] = useState(false);
+  const [learningNoteSize, setLearningNoteSize] = useState({
+    width: 300,
+    height: 500,
+  });
 
   // Auto-select first project when component mounts
   useEffect(() => {
@@ -27,58 +33,178 @@ export default function WindowDesktop({
     }
   }, []);
 
+  // Handle minimize for learning note
+  const handleMinimizeLearningNote = () => {
+    setIsLearningNoteMinimized(!isLearningNoteMinimized);
+  };
+
+  // Handle update for learning note (resize, etc.)
+  const handleLearningNoteUpdate = (updateData) => {
+    if (updateData.size) {
+      setLearningNoteSize(updateData.size);
+    }
+  };
+
   // Function to render project details
   const renderProjectDetails = (project) => {
     return (
       <div className="space-y-6">
-        {/* Project Header */}
-        <div className="border-b border-[#2c2c2e] pb-4">
-          <h2 className="text-2xl font-bold text-[#f2f2f7] mb-2">
-            {project.title}
-          </h2>
-          <p className="text-[#8e8e93]">{project.bio}</p>
+        {/* Project Screenshot - Enhanced */}
+        <div className="relative rounded-xl overflow-hidden bg-[#2c2c2e] h-56 w-full group cursor-pointer shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02]">
+          {project.screenshot ? (
+            <>
+              {/* Actual Screenshot Image with Enhanced Effects */}
+              <Image
+                src={project.screenshot}
+                alt={`${project.title} screenshot`}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                style={{ objectPosition: "top", objectFit: "cover" }}
+                priority
+              />
+
+              {/* Subtle overlay for better text readability */}
+              <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30"></div>
+
+              {/* Right-Justified Title Overlay */}
+              <div className="absolute inset-0 flex flex-col items-end justify-end z-10 p-6">
+                <div className="text-right space-y-3">
+                  <h3 className="text-5xl font-black text-gray-900 leading-tight tracking-tight drop-shadow-lg">
+                    {project.title}
+                  </h3>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Fallback - Right-Justified Title Overlay */}
+              <div className="absolute inset-0 flex flex-col items-end justify-end z-10 p-6">
+                <div className="text-right space-y-3">
+                  <h3 className="text-5xl font-black text-gray-900 leading-tight tracking-tight drop-shadow-lg">
+                    {project.title}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Enhanced background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2c2c2e] to-[#1a1a1a] opacity-90"></div>
+            </>
+          )}
+          {/* Fallback text for accessibility */}
+          <span className="sr-only">Screenshot for {project.title}</span>
         </div>
 
-        {/* Project Image + Tech Stack */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[#e5e5ea]">
-              Project Screenshot
-            </h3>
-            <div className="relative rounded-lg overflow-hidden bg-[#2c2c2e] h-48 flex items-center justify-center">
-              <span className="text-[#8e8e93]">Screenshot placeholder</span>
-            </div>
-          </div>
+        {/* Project Description */}
+        <p className="text-[#8e8e93] text-base leading-relaxed mt-6">
+          {project.description}
+        </p>
 
+        {/* Tech Stack + Key Features + What I Learned - Three Column Layout */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Tech Stack Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[#e5e5ea]">Tech Stack</h3>
             <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech, index) => (
+              {project.technologies?.map((tech, index) => (
                 <span
                   key={index}
                   className="px-3 py-1 bg-[#2997FF] text-white rounded-full text-sm"
                 >
                   {tech}
                 </span>
-              ))}
+              )) || (
+                <span className="text-[#8e8e93]">No technologies listed</span>
+              )}
             </div>
+          </div>
+          {/* Key Features */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[#e5e5ea]">
+              Key Features
+            </h3>
+            <div className="space-y-2">
+              {project.features?.map((feature, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 text-sm text-[#d1d1d6]"
+                >
+                  <span className="w-2 h-2 bg-[#2997FF] rounded-full flex-shrink-0"></span>
+                  <span>{feature}</span>
+                </div>
+              )) || <span className="text-[#8e8e93]">No features listed</span>}
+            </div>
+          </div>
+
+          {/* What I Learned - StickyNote Component */}
+          <div className="relative">
+            <StickyNote
+              id="project-learning-note"
+              title="📝 What I Learned"
+              content={`• Challenge:
+${project.challenge}
+
+• Solution:
+${project.solution}
+
+• Key Learning:
+${project.learning}`}
+              position={{ top: 0, left: 0 }}
+              size={learningNoteSize}
+              bgColor="#FFE066"
+              textColor="#333333"
+              isEditable={false}
+              type="permanent"
+              isMinimized={isLearningNoteMinimized}
+              onMinimize={handleMinimizeLearningNote}
+              onUpdate={handleLearningNoteUpdate}
+            />
           </div>
         </div>
 
-        {/* Sticky Note */}
-        <div className="bg-[#FFE066] rounded-lg p-4 text-[#333333]">
-          <h4 className="font-semibold mb-2">📝 What I Learned</h4>
-          <p className="text-sm">Challenge and learning placeholder text...</p>
-        </div>
+        {/* Performance Metrics + Project Highlights - Side by Side */}
+        <div className="grid grid-cols-3 gap-6">
+          {/* Performance Metrics */}
+          {project.metrics && (
+            <div className="space-y-4 col-span-1 mt-0">
+              <h3 className="text-lg font-semibold text-[#e5e5ea]">
+                Performance Metrics
+              </h3>
+              <div className="space-y-3">
+                {Object.entries(project.metrics).map(([key, value], index) => (
+                  <div key={index} className="bg-[#2c2c2e] rounded-lg p-3">
+                    <div className="text-xs text-[#8e8e93] uppercase tracking-wide">
+                      {key}
+                    </div>
+                    <div className="text-sm font-semibold text-[#f2f2f7]">
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-        {/* Action Links */}
-        <div className="flex gap-4">
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#2c2c2e] rounded-lg hover:bg-[#3c3c3e] transition-colors">
-            <span>GitHub</span>
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#2997FF] rounded-lg hover:bg-[#1a7ae6] transition-colors">
-            <span>Live Demo</span>
-          </button>
+          {/* Project Highlights */}
+          {project.highlights && (
+            <div className="space-y-4 col-span-2 mt-10">
+              <h3 className="text-lg font-semibold text-[#e5e5ea]">
+                Project Highlights
+              </h3>
+              <div className="space-y-2">
+                {project.highlights?.map((highlight, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-sm text-[#d1d1d6]"
+                  >
+                    <span className="w-1.5 h-1.5 bg-[#2997FF] rounded-full flex-shrink-0"></span>
+                    <span>{highlight}</span>
+                  </div>
+                )) || (
+                  <span className="text-[#8e8e93]">No highlights listed</span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -146,7 +272,9 @@ export default function WindowDesktop({
                   className={`flex items-center gap-2 pl-4 py-1 rounded-md hover:bg-[#2c2c2e]/70 focus:bg-[#2c2c2e] text-left transition-colors ${
                     selectedProject?.id === id ? "bg-[#2c2c2e]" : ""
                   }`}
-                  onClick={() => setSelectedProject({ id, title, icon, bio })}
+                  onClick={() =>
+                    setSelectedProject(projectsData.find((p) => p.id === id))
+                  }
                 >
                   <Image
                     className="inline-block opacity-90"
@@ -171,13 +299,43 @@ export default function WindowDesktop({
       {/* Right pane */}
       <div className="flex flex-col w-full justify-between items-center">
         {/* Toolbar/Header */}
-        <div className="w-full h-16 rounded-tr-lg p-0 m-0 pt-4 pl-10 bg-[#2c2c2e] border-b border-[#2c2c2e]">
-          <div className="text-[14px] font-medium text-[#f2f2f7]">
-            {selectedProject ? selectedProject.title : title}
+        <div className="w-full h-16 rounded-tr-lg p-0 m-0 pt-4 pl-10 pr-4 bg-[#2c2c2e] border-b border-[#2c2c2e] flex items-center justify-between">
+          <div>
+            <div className="text-[14px] font-medium text-[#f2f2f7]">
+              {selectedProject ? selectedProject.title : title}
+            </div>
+            <div className="text-[12px] text-[rgb(102,238,229)]">
+              {selectedProject ? selectedProject.bio : bio}
+            </div>
           </div>
-          <div className="text-[12px] text-[rgb(102,238,229)]">
-            {selectedProject ? selectedProject.bio : bio}
-          </div>
+
+          {/* Action Links */}
+          {selectedProject && (
+            <div className="flex gap-2">
+              <a
+                href={selectedProject.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-3 py-1 bg-[#363636] rounded text-xs hover:bg-[#4a4a4a] transition-colors"
+              >
+                <Image
+                  src="/github-icon.svg"
+                  width={16}
+                  height={16}
+                  alt="GitHub"
+                />
+                <span>Code</span>
+              </a>
+              <a
+                href={selectedProject.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-3 py-1 bg-[#2997FF] rounded text-xs hover:bg-[#1a7ae6] transition-colors"
+              >
+                <span>Demo</span>
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Content area */}

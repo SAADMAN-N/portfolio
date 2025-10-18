@@ -422,7 +422,7 @@ const StickyNote = memo(function StickyNote({
               />
             ) : (
               <p
-                className={`text-sm flex-1 overflow-hidden leading-relaxed text-gray-800 font-normal ${
+                className={`text-sm flex-1 overflow-hidden leading-relaxed text-gray-800 font-normal whitespace-pre-line ${
                   type === "visitor" ? "cursor-text" : "cursor-default"
                 }`}
                 onClick={handleContentClick}
