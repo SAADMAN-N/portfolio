@@ -209,14 +209,14 @@ export default function Desktop() {
     return { top: pos.top, left: pos.left };
   }
 
-  // Re-clamp and snap all icons on window resize
+  // Re-clamp all icons on window resize (snapping disabled)
   useEffect(() => {
     function handleResize() {
       setItems((prev) =>
         prev.map((it) => {
           const clamped = clampToBounds(it.position);
-          const snapped = snapToGrid(clamped);
-          return { ...it, position: snapped };
+          // const snapped = snapToGrid(clamped); // Commented out snapping to grid
+          return { ...it, position: clamped }; // Use clamped position directly
         })
       );
     }
@@ -422,7 +422,7 @@ export default function Desktop() {
       {/* Desktop Items DndContext */}
       <DndContext
         sensors={sensors}
-        modifiers={[restrictToWindowEdges]}
+        // modifiers={[restrictToWindowEdges]} // Commented out to disable snapping/jumping
         onDragEnd={({ active, delta }) => {
           setItems((prev) =>
             prev.map((it) => {
@@ -432,8 +432,8 @@ export default function Desktop() {
                 left: it.position.left + delta.x,
               };
               const clamped = clampToBounds(next);
-              const snapped = snapToGrid(clamped);
-              return { ...it, position: snapped };
+              // const snapped = snapToGrid(clamped); // Commented out snapping to grid
+              return { ...it, position: clamped }; // Use clamped position directly
             })
           );
         }}
@@ -582,13 +582,13 @@ export default function Desktop() {
             key={item.id}
             title={item.label}
             position={{
-              top: 100,
+              top: 80, // Moved up from 100 to avoid dock overlap
               left: `calc(50vw - 40vw)`, // Center horizontally (50vw - half of 80vw)
             }}
             bio={item.bio}
             desktopItem={item}
             width="80vw" // Set width to 80% of viewport
-            height="80vh" // Set height to 80% of viewport
+            height="80vh" // Reduced from 80vh to 75vh to avoid dock overlap
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, [item.id]: false }))
             }
