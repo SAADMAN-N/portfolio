@@ -1,9 +1,8 @@
 import InfiniteMenu from "./InfiniteMenu";
+import { useState, useEffect } from "react";
 
-// Performance optimization: Limit initial images to prevent WebGL texture atlas overload
-// The InfiniteMenu component loads all images into a WebGL texture atlas at once,
-// which causes performance issues with too many high-resolution images
-const initialItems = [
+// Smart loading strategy: Load curated images first for smooth animation, then load rest in background
+const curatedImages = [
   {
     image: "/profile-icon.jpeg",
     link: "",
@@ -24,24 +23,10 @@ const initialItems = [
     description: "A peaceful moment along the coast of the Red Sea in Al Hamra",
   },
   {
-    image: "/gallery-food-1.jpeg",
-    link: "",
-    title: "Culinary Adventures",
-    description:
-      "Exploring local flavors and discovering new tastes wherever I go",
-  },
-  {
     image: "/gallery-travel-1.jpeg",
     link: "",
     title: "I love gaming",
     description: "and I love travelling...",
-  },
-  {
-    image: "/gallery-food-2.jpeg",
-    link: "",
-    title: "Foodie Chronicles",
-    description:
-      "Documenting delicious discoveries from my travels around the world",
   },
   {
     image: "/gallery-travel-2.jpeg",
@@ -56,9 +41,18 @@ const initialItems = [
     title: "Taste of Culture",
     description: "Food is the universal language that connects us all",
   },
-  // Add a few more curated images for better initial experience
+];
+
+// Additional images to load progressively after initial animation
+const additionalImages = [
   {
-    image: "/IMG_3673.jpeg",
+    image: "/IMG_5511.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_5530.jpeg",
     link: "",
     title: "",
     description: "",
@@ -76,15 +70,90 @@ const initialItems = [
     description: "",
   },
   {
+    image: "/IMG_6050.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_6070.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
     image: "/IMG_6091.jpeg",
     link: "",
     title: "",
     description: "",
   },
+  {
+    image: "/IMG_6099.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_6190.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_6483.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_6519.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_7159.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_7282.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_9082.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_9136.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_9750.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_9902.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
+  {
+    image: "/IMG_9907.jpeg",
+    link: "",
+    title: "",
+    description: "",
+  },
 ];
-
-// Use initial items for better performance - limit to 12 images max for smooth animation
-const items = initialItems;
 
 export default function PhotoViewer({
   top = "50vh",
@@ -92,6 +161,27 @@ export default function PhotoViewer({
   style,
   isClosing = false,
 }) {
+  const [currentItems, setCurrentItems] = useState(curatedImages);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  useEffect(() => {
+    // Start with curated images for smooth animation
+    setCurrentItems(curatedImages);
+
+    // Load additional images in background after animation completes
+    const timer = setTimeout(() => {
+      setIsLoadingMore(true);
+      // Add more images after a shorter delay
+      setTimeout(() => {
+        const allImages = [...curatedImages, ...additionalImages];
+        setCurrentItems(allImages);
+        setIsLoadingMore(false);
+      }, 500); // Load additional images after 500ms
+    }, 1500); // Start loading after 1.5 seconds (let animation finish)
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div
       className={`rounded-2xl transition-all duration-200 ease-in-out z-[10000] ${
@@ -108,8 +198,19 @@ export default function PhotoViewer({
         border: "1px solid rgba(0, 0, 0, 0.1)",
       }}
       onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseUp={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchEnd={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
+      onPointerUp={(e) => e.stopPropagation()}
     >
-      <InfiniteMenu items={items} />
+      <InfiniteMenu key={currentItems.length} items={currentItems} />
+      {isLoadingMore && (
+        <div className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-xs">
+          Loading more photos...
+        </div>
+      )}
     </div>
   );
 }
