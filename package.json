@@ -21,7 +21,7 @@
     "clsx": "^2.1.1",
     "cobe": "^0.6.5",
     "gl-matrix": "^3.4.4",
-    "lucide-react": "^0.544.0",
+    "lucide-react": "^0.546.0",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.0",
     "motion": "^12.23.22",
