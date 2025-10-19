@@ -40,7 +40,6 @@ export default function Menubar({ onTidy, onCreateStickyNote }) {
           Sharf's portfolio
         </span>
         <button className="text-gray-950 hover:underline">Resume</button>
-        <button className="text-gray-950 hover:underline">Contact</button>
         <button
           onClick={onCreateStickyNote}
           className="text-gray-950 hover:underline"

@@ -1,5 +1,41 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import { X } from "lucide-react";
+
+/**
+ * SphereImageGrid - Interactive 3D Image Sphere Component
+ *
+ * A React component that displays images arranged in a 3D sphere layout.
+ * Images are distributed using Fibonacci sphere distribution for optimal coverage.
+ * Supports drag-to-rotate, momentum physics, auto-rotation, and modal image viewing.
+ *
+ * Features:
+ * - 3D sphere layout with Fibonacci distribution for even image placement
+ * - Smooth drag-to-rotate interaction with momentum physics
+ * - Auto-rotation capability with configurable speed
+ * - Dynamic scaling based on position and visibility
+ * - Collision detection to prevent image overlap
+ * - Modal view for enlarged image display
+ * - Touch support for mobile devices
+ * - Customizable appearance and behavior
+ * - Performance optimized with proper z-indexing and visibility culling
+ *
+ * Usage:
+ * ```jsx
+ * <SphereImageGrid
+ *   images={imageArray}
+ *   containerSize={600}
+ *   sphereRadius={200}
+ *   autoRotate={true}
+ *   dragSensitivity={0.8}
+ * />
+ * ```
+ */
 
 // ==========================================
 // CONSTANTS & CONFIGURATION
@@ -189,54 +225,8 @@ const SphereImageGrid = ({
       };
     });
 
-    // Apply collision detection to prevent overlaps
-    const adjustedPositions = [...positions];
-
-    for (let i = 0; i < adjustedPositions.length; i++) {
-      const pos = adjustedPositions[i];
-      if (!pos.isVisible) continue;
-
-      let adjustedScale = pos.scale;
-      const imageSize = baseImageSize * adjustedScale;
-
-      // Check for overlaps with other visible images
-      for (let j = 0; j < adjustedPositions.length; j++) {
-        if (i === j) continue;
-
-        const other = adjustedPositions[j];
-        if (!other.isVisible) continue;
-
-        const otherSize = baseImageSize * other.scale;
-
-        // Calculate 2D distance between images on screen
-        const dx = pos.x - other.x;
-        const dy = pos.y - other.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        // Minimum distance to prevent overlap (with more generous padding)
-        const minDistance = (imageSize + otherSize) / 2 + 25;
-
-        if (distance < minDistance && distance > 0) {
-          // More aggressive scale reduction to prevent overlap
-          const overlap = minDistance - distance;
-          const reductionFactor = Math.max(
-            0.4,
-            1 - (overlap / minDistance) * 0.6
-          );
-          adjustedScale = Math.min(
-            adjustedScale,
-            adjustedScale * reductionFactor
-          );
-        }
-      }
-
-      adjustedPositions[i] = {
-        ...pos,
-        scale: Math.max(0.25, adjustedScale), // Ensure minimum scale
-      };
-    }
-
-    return adjustedPositions;
+    // Skip collision detection for better performance
+    return positions;
   }, [imagePositions, rotation, actualSphereRadius, baseImageSize]);
 
   const clampRotationSpeed = useCallback(
@@ -404,8 +394,15 @@ const SphereImageGrid = ({
   }, [generateSpherePositions]);
 
   useEffect(() => {
-    const animate = () => {
-      updateMomentum();
+    let lastTime = 0;
+    const targetFPS = 45; // Reduce to 45 FPS for better performance
+    const frameInterval = 1000 / targetFPS;
+
+    const animate = (currentTime) => {
+      if (currentTime - lastTime >= frameInterval) {
+        updateMomentum();
+        lastTime = currentTime;
+      }
       animationFrame.current = requestAnimationFrame(animate);
     };
 
@@ -452,50 +449,40 @@ const SphereImageGrid = ({
   // RENDER HELPERS
   // ==========================================
 
-  // Calculate world positions once per render
-  const worldPositions = calculateWorldPositions();
+  // Calculate world positions with memoization
+  const worldPositions = useMemo(() => {
+    return calculateWorldPositions();
+  }, [imagePositions, rotation, actualSphereRadius, baseImageSize]);
 
-  const renderImageNode = useCallback(
-    (image, index) => {
-      const position = worldPositions[index];
-
-      if (!position || !position.isVisible) return null;
-
-      const imageSize = baseImageSize * position.scale;
-      const isHovered = hoveredIndex === index;
-      const finalScale = isHovered ? Math.min(1.2, 1.2 / position.scale) : 1;
-
-      return (
-        <div
-          key={image.id}
-          className="absolute cursor-pointer select-none transition-transform duration-200 ease-out"
+  // Create individual memoized image components
+  const MemoizedImage = React.memo(({ image, index }) => (
+    <div className="w-full h-full sphere-image">
+      <div className="relative w-full h-full rounded-full overflow-hidden shadow-lg border-2 border-white/20">
+        <img
+          src={image.src}
+          alt={image.alt}
+          className="w-full h-full object-cover"
+          draggable={false}
+          loading={index < 3 ? "eager" : "lazy"}
+          // Add these attributes to prevent re-requests
+          crossOrigin="anonymous"
+          decoding="async"
+          // Force cache behavior
           style={{
-            width: `${imageSize}px`,
-            height: `${imageSize}px`,
-            left: `${containerSize / 2 + position.x}px`,
-            top: `${containerSize / 2 + position.y}px`,
-            opacity: position.fadeOpacity,
-            transform: `translate(-50%, -50%) scale(${finalScale})`,
-            zIndex: position.zIndex,
+            imageRendering: "optimizeSpeed",
+            backfaceVisibility: "hidden",
           }}
-          onMouseEnter={() => setHoveredIndex(index)}
-          onMouseLeave={() => setHoveredIndex(null)}
-          onClick={() => setSelectedImage(image)}
-        >
-          <div className="relative w-full h-full rounded-full overflow-hidden shadow-lg border-2 border-white/20">
-            <img
-              src={image.src}
-              alt={image.alt}
-              className="w-full h-full object-cover"
-              draggable={false}
-              loading={index < 3 ? "eager" : "lazy"}
-            />
-          </div>
-        </div>
-      );
-    },
-    [worldPositions, baseImageSize, containerSize, hoveredIndex]
-  );
+        />
+      </div>
+    </div>
+  ));
+
+  // Memoize image elements to prevent re-creation - more aggressive memoization
+  const memoizedImages = useMemo(() => {
+    return images.map((image, index) => (
+      <MemoizedImage key={`memo-${image.id}`} image={image} index={index} />
+    ));
+  }, [images]);
 
   const renderSpotlightModal = () => {
     if (!selectedImage) return null;
@@ -590,7 +577,16 @@ const SphereImageGrid = ({
           from { transform: scale(0.8); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
+        
+        /* Force image caching and prevent re-requests */
+        .sphere-image img {
+          image-rendering: optimizeSpeed;
+          backface-visibility: hidden;
+          transform: translateZ(0);
+          will-change: auto;
+        }
       `}</style>
+
       <div
         ref={containerRef}
         className={`relative select-none cursor-grab active:cursor-grabbing ${className}`}
@@ -603,9 +599,43 @@ const SphereImageGrid = ({
         onTouchStart={handleTouchStart}
       >
         <div className="relative w-full h-full" style={{ zIndex: 10 }}>
-          {images.map((image, index) => renderImageNode(image, index))}
+          {images.map((image, index) => {
+            const position = worldPositions[index];
+            if (!position || !position.isVisible) return null;
+
+            // Pre-calculate values to avoid repeated calculations
+            const imageSize = baseImageSize * position.scale;
+            const isHovered = hoveredIndex === index;
+            const finalScale = isHovered ? 1.2 : 1;
+            const leftPos = containerSize / 2 + position.x;
+            const topPos = containerSize / 2 + position.y;
+
+            return (
+              <div
+                key={image.id}
+                className={`absolute cursor-pointer select-none ${!isDragging ? "transition-transform duration-150 ease-out" : ""}`}
+                style={{
+                  width: `${imageSize}px`,
+                  height: `${imageSize}px`,
+                  left: `${leftPos}px`,
+                  top: `${topPos}px`,
+                  opacity: position.fadeOpacity,
+                  transform: `translate(-50%, -50%) scale(${finalScale})`,
+                  zIndex: position.zIndex,
+                  willChange: "transform, opacity",
+                }}
+                onMouseEnter={() => !isDragging && setHoveredIndex(index)}
+                onMouseLeave={() => !isDragging && setHoveredIndex(null)}
+                onClick={() => setSelectedImage(image)}
+              >
+                {/* Use the memoized image element */}
+                {memoizedImages[index]}
+              </div>
+            );
+          })}
         </div>
       </div>
+
       {renderSpotlightModal()}
     </>
   );

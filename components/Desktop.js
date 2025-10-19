@@ -20,6 +20,8 @@ import PhotoViewer from "./PhotoViewer";
 import AboutMe from "./AboutMe";
 import Reminders from "./Reminders";
 import StickyNote from "./StickyNote";
+import { GlowEffect } from "@/components/ui/glow-effect";
+import { MorphingMessagePopover } from "@/components/ui/morphing-message-popover";
 import { aboutMeWindows } from "@/data/aboutMeWindows";
 import { stickyNotesData, getApprovedNotes } from "@/data/stickyNotesData";
 
@@ -79,6 +81,24 @@ export default function Desktop() {
   const [stickyNotes, setStickyNotes] = useState([]);
   const [minimizedNotes, setMinimizedNotes] = useState(new Set());
   const [isRemindersMinimized, setIsRemindersMinimized] = useState(false);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  // Inspirational quotes for rotation
+  const quotes = [
+    "Don't wait for inspiration. It comes while working.",
+    "The worst enemy to creativity is self-doubt.",
+    "There is no innovation and creativity without failure.",
+    "The creative process is a process of surrender, not control.",
+  ];
+
+  // Rotate quotes every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [quotes.length]);
 
   // Configure drag sensors for better performance
   const sensors = useSensors(
@@ -513,6 +533,60 @@ export default function Desktop() {
 
       {/* Hero Component - rendered after sticky notes */}
       <Hero onDesktopClick={handleDesktopClick} />
+
+      {/* GlowEffect Component - custom positioned decorative element */}
+      <div
+        className="absolute"
+        style={{
+          top: "150px",
+          left: "950px",
+          width: "300px",
+          height: "250px",
+          zIndex: 1,
+        }}
+      >
+        <GlowEffect
+          colors={["#0894FF", "#C959DD", "#FF2E54", "#FF9004"]}
+          mode="static"
+          blur="strong"
+          scale={1.01}
+          duration={4}
+        />
+        <div className="relative w-full h-full rounded-xl bg-black p-4 flex flex-col justify-between text-white">
+          <div className="flex items-center mb-2">
+            <div
+              className="w-3 h-3 rounded-full bg-green-500 mr-2 animate-pulse ring-2 ring-green-400/30 ring-offset-2 ring-offset-black"
+              style={{
+                boxShadow:
+                  "0 0 10px rgba(34, 197, 94, 0.6), 0 0 20px rgba(34, 197, 94, 0.4)",
+              }}
+            ></div>
+            <span className="text-lg font-semibold">Sharf</span>
+          </div>
+
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="text-sm text-gray-400 mb-1">
+              Status:{" "}
+              <span className="font-medium text-white">Sleeping...</span>
+            </div>
+            <div className="text-xs text-gray-400 mb-2">
+              Current Project:{" "}
+              <span className="font-medium text-white">Obliq.chat</span>
+            </div>
+            <div className="text-xs text-gray-500 mb-2">
+              Last seen: 2 minutes ago
+            </div>
+            <div className="text-xs text-gray-600 italic text-center leading-relaxed">
+              "{quotes[currentQuoteIndex]}"
+            </div>
+          </div>
+
+          {/* Message Popover */}
+          <div className="flex justify-end pb-2 pr-2">
+            <MorphingMessagePopover />
+          </div>
+        </div>
+      </div>
 
       {/* Reminders Component - rendered before desktop windows */}
       <Reminders

@@ -1,4 +1,4 @@
-import SphereImageGrid from "./ui/image-sphere.jsx";
+import SphereImageGrid from "./ui/image-sphere";
 import { useState, useEffect } from "react";
 
 // Smart loading strategy: Load curated images first for smooth animation, then load rest in background
@@ -197,7 +197,7 @@ export default function PhotoViewer({
       setIsLoadingMore(true);
       // Add more images after a shorter delay - limit to 12 total for performance
       setTimeout(() => {
-        const limitedAdditionalImages = additionalImages.slice(0, 4); // Only 4 additional images for better performance
+        const limitedAdditionalImages = additionalImages.slice(0, 12); // Show only 12 additional images for better performance
         const allImages = [...curatedImages, ...limitedAdditionalImages];
         setCurrentItems(allImages);
         setIsLoadingMore(false);
@@ -227,19 +227,75 @@ export default function PhotoViewer({
       onPointerDown={(e) => e.stopPropagation()}
       onPointerUp={(e) => e.stopPropagation()}
     >
-      <div className="w-full h-full flex items-center justify-center p-4">
+      <div className="w-full h-full flex items-center justify-center p-4 relative">
+        {/* Sticker decorations - varied sizes and rotations */}
+        <div className="absolute top-12 left-6 w-14 h-14 rotate-[330deg] pointer-events-none">
+          <img
+            src="/ramen-image.png"
+            alt="Ramen sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+
+        <div className="absolute top-8 right-8 w-12 h-12 rotate-12 pointer-events-none">
+          <img
+            src="/bench-press.png"
+            alt="Bench press sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+
+        <div className="absolute bottom-8 left-8 w-14 h-14 -rotate-6 pointer-events-none">
+          <img
+            src="/compass-image.png"
+            alt="Compass sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+
+        <div className="absolute bottom-6 right-6 w-16 h-16 rotate-45 pointer-events-none">
+          <img
+            src="/island-image.png"
+            alt="Island sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+
+        <div className="absolute top-1/3 left-1/4 w-10 h-10 rotate-[15deg] pointer-events-none">
+          <img
+            src="/neck-pillow.png"
+            alt="Neck pillow sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+
+        <div className="absolute bottom-1/3 right-1/4 w-14 h-14 -rotate-12 pointer-events-none">
+          <img
+            src="/luggage-image.png"
+            alt="Luggage sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
+
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-20 h-20 rotate-[75deg] pointer-events-none">
+          <img
+            src="/plane-icon.png"
+            alt="Plane icon sticker"
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
+        </div>
         <SphereImageGrid
           images={currentItems}
           containerSize={600}
           sphereRadius={200}
-          dragSensitivity={0.4}
-          momentumDecay={0.96}
+          dragSensitivity={0.6}
+          momentumDecay={0.94}
           maxRotationSpeed={2}
-          baseImageScale={0.2}
-          hoverScale={1.1}
-          perspective={600}
-          autoRotate={true}
-          autoRotateSpeed={0.2}
+          baseImageScale={0.14}
+          hoverScale={1.2}
+          perspective={0}
+          autoRotate={false}
+          autoRotateSpeed={0.15}
           className="w-full h-full"
         />
       </div>
