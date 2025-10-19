@@ -26,12 +26,12 @@ export default function WindowDesktop({
     height: 500,
   });
 
-  // Auto-select first project when component mounts
+  // Auto-select first project when component mounts (only if no custom content is provided)
   useEffect(() => {
-    if (projectsData.length > 0 && !selectedProject) {
+    if (projectsData.length > 0 && !selectedProject && !content) {
       setSelectedProject(projectsData[0]);
     }
-  }, []);
+  }, [content]);
 
   // Handle minimize for learning note
   const handleMinimizeLearningNote = () => {
@@ -224,83 +224,114 @@ ${project.learning}`}
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Sidebar */}
-      <div className="w-fit min-w-48 h-full rounded-l-lg px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">
-        <div className="flex h-10 rounded-tl-lg p-3 gap-2 items-center">
-          <div
-            className="relative group cursor-pointer w-[12px] h-[12px]"
-            onClick={onClose}
-            title="Close"
-          >
-            <Image src="/close-icon.svg" alt="Close" width={12} height={12} />
-            <Image
-              src="/cross-icon.svg"
-              alt="Close overlay"
-              width={6}
-              height={6}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 transition-opacity pointer-events-none"
-            />
+      {/* Sidebar - only show when no custom content is provided */}
+      {!content && (
+        <div className="w-fit min-w-48 h-full rounded-l-lg px-2 flex flex-col justify-start bg-[#1c1c1e] border-r border-[#2c2c2e]">
+          <div className="flex h-10 rounded-tl-lg p-3 gap-2 items-center">
+            <div
+              className="relative group cursor-pointer w-[12px] h-[12px]"
+              onClick={onClose}
+              title="Close"
+            >
+              <Image src="/close-icon.svg" alt="Close" width={12} height={12} />
+              <Image
+                src="/cross-icon.svg"
+                alt="Close overlay"
+                width={6}
+                height={6}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 transition-opacity pointer-events-none"
+              />
+            </div>
+            <div className="w-[12px] h-[12px]">
+              <Image
+                src="/minimize-icon.svg"
+                alt="Minimize"
+                width={12}
+                height={12}
+              />
+            </div>
+            <div className="w-[12px] h-[12px]">
+              <Image
+                src="/maximize-icon.svg"
+                alt="Maximize"
+                width={12}
+                height={12}
+              />
+            </div>
           </div>
-          <div className="w-[12px] h-[12px]">
-            <Image
-              src="/minimize-icon.svg"
-              alt="Minimize"
-              width={12}
-              height={12}
-            />
-          </div>
-          <div className="w-[12px] h-[12px]">
-            <Image
-              src="/maximize-icon.svg"
-              alt="Maximize"
-              width={12}
-              height={12}
-            />
+
+          <div className="flex flex-col rounded-bl-lg justify-between">
+            <div className=" w-full flex flex-col pt-6 gap-3">
+              <div className="text-[11px] tracking-wide pl-4 uppercase text-[#8e8e93]">
+                Projects
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {projectsData.map(({ id, title, icon, bio }) => (
+                  <button
+                    key={id}
+                    className={`flex items-center gap-2 pl-4 py-1 rounded-md hover:bg-[#2c2c2e]/70 focus:bg-[#2c2c2e] text-left transition-colors ${
+                      selectedProject?.id === id ? "bg-[#2c2c2e]" : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedProject(projectsData.find((p) => p.id === id))
+                    }
+                  >
+                    <Image
+                      className="inline-block opacity-90"
+                      src={icon}
+                      alt={`${title} icon`}
+                      width={18}
+                      height={18}
+                    />
+                    <span className="text-[13px] text-[#e5e5ea]">{title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="w-full pt-10 pl-4 pr-3 pb-4">
+              <div className="text-[11px] tracking-wide uppercase text-[#8e8e93]">
+                Recents
+              </div>
+            </div>
           </div>
         </div>
-
-        <div className="flex flex-col rounded-bl-lg justify-between">
-          <div className=" w-full flex flex-col pt-6 gap-3">
-            <div className="text-[11px] tracking-wide pl-4 uppercase text-[#8e8e93]">
-              Projects
-            </div>
-
-            <div className="flex flex-col gap-2">
-              {projectsData.map(({ id, title, icon, bio }) => (
-                <button
-                  key={id}
-                  className={`flex items-center gap-2 pl-4 py-1 rounded-md hover:bg-[#2c2c2e]/70 focus:bg-[#2c2c2e] text-left transition-colors ${
-                    selectedProject?.id === id ? "bg-[#2c2c2e]" : ""
-                  }`}
-                  onClick={() =>
-                    setSelectedProject(projectsData.find((p) => p.id === id))
-                  }
-                >
-                  <Image
-                    className="inline-block opacity-90"
-                    src={icon}
-                    alt={`${title} icon`}
-                    width={18}
-                    height={18}
-                  />
-                  <span className="text-[13px] text-[#e5e5ea]">{title}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="w-full pt-10 pl-4 pr-3 pb-4">
-            <div className="text-[11px] tracking-wide uppercase text-[#8e8e93]">
-              Recents
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Right pane */}
-      <div className="flex flex-col w-full justify-between items-center">
+      <div
+        className={`flex flex-col w-full justify-between items-center ${content ? "rounded-lg" : ""}`}
+      >
         {/* Toolbar/Header */}
-        <div className="w-full h-16 rounded-tr-lg p-0 m-0 pt-4 pl-10 pr-4 bg-[#2c2c2e] border-b border-[#2c2c2e] flex items-center justify-between">
-          <div>
+        <div
+          className={`w-full h-16 p-0 m-0 pt-4 pr-4 bg-[#2c2c2e] border-b border-[#2c2c2e] flex items-center justify-between ${content ? "rounded-t-lg pl-3" : "rounded-tr-lg pl-10"}`}
+        >
+          {/* Window controls for custom content windows (when sidebar is hidden) */}
+          {content && (
+            <div className="flex items-center">
+              <div
+                className="relative group cursor-pointer w-[12px] h-[12px] mr-4"
+                onClick={onClose}
+                title="Close"
+              >
+                <Image
+                  src="/close-icon.svg"
+                  alt="Close"
+                  width={12}
+                  height={12}
+                />
+                <Image
+                  src="/cross-icon.svg"
+                  alt="Close overlay"
+                  width={6}
+                  height={6}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-60 transition-opacity pointer-events-none"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex-1">
             <div className="text-[14px] font-medium text-[#f2f2f7]">
               {selectedProject ? selectedProject.title : title}
             </div>
@@ -339,7 +370,9 @@ ${project.learning}`}
         </div>
 
         {/* Content area */}
-        <div className="w-full h-full rounded-br-lg p-6 bg-[#363636] text-[#d1d1d6] overflow-y-auto">
+        <div
+          className={`w-full h-full p-6 bg-[#363636] text-[#d1d1d6] overflow-y-auto ${content ? "rounded-b-lg" : "rounded-br-lg"}`}
+        >
           {selectedProject ? (
             // Show project details when a project is selected
             renderProjectDetails(selectedProject)
