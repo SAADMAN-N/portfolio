@@ -85,17 +85,29 @@ export default function Desktop() {
 
   // Inspirational quotes for rotation
   const quotes = [
-    "Don't wait for inspiration. It comes while working.",
-    "The worst enemy to creativity is self-doubt.",
-    "There is no innovation and creativity without failure.",
-    "The creative process is a process of surrender, not control.",
+    {
+      text: "Don't wait for inspiration. It comes while working.",
+      author: "Henri Matisse",
+    },
+    {
+      text: "The worst enemy to creativity is self-doubt.",
+      author: "Sylvia Plath",
+    },
+    {
+      text: "There is no innovation and creativity without failure.",
+      author: "Brené Brown",
+    },
+    {
+      text: "The creative process is a process of surrender, not control.",
+      author: "Julia Cameron",
+    },
   ];
 
-  // Rotate quotes every 5 seconds
+  // Rotate quotes every 1 minute
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
-    }, 5000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [quotes.length]);
@@ -564,25 +576,31 @@ export default function Desktop() {
             <span className="text-lg font-semibold">Sharf</span>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center">
-            <div className="text-sm text-gray-400 mb-1">
-              Status:{" "}
-              <span className="font-medium text-white">Sleeping...</span>
+          <div className="flex-1 flex flex-col">
+            <div className="mt-2">
+              <div className="text-sm text-gray-400 mb-1">
+                Probably:{" "}
+                <span className="font-medium text-white">Sleeping...</span>
+              </div>
+              <div className="text-xs text-gray-400 mb-2">
+                Working on:{" "}
+                <span className="font-medium text-white">Obliq.chat</span>
+              </div>
+              <div className="text-xs text-gray-400 mb-2">
+                Listening to:{" "}
+                <span className="font-medium text-white">Tame Impala</span>
+              </div>
             </div>
-            <div className="text-xs text-gray-400 mb-2">
-              Current Project:{" "}
-              <span className="font-medium text-white">Obliq.chat</span>
-            </div>
-            <div className="text-xs text-gray-500 mb-2">
-              Last seen: 2 minutes ago
-            </div>
-            <div className="text-xs text-gray-600 italic text-center leading-relaxed">
-              "{quotes[currentQuoteIndex]}"
+            <div className="flex-1 flex items-end">
+              <div className="text-xs text-gray-300 italic text-right leading-relaxed w-full">
+                "{quotes[currentQuoteIndex].text}" ~{" "}
+                {quotes[currentQuoteIndex].author}
+              </div>
             </div>
           </div>
 
           {/* Message Popover */}
-          <div className="flex justify-end pb-2 pr-2">
+          <div className="flex justify-end pb-2 pr-0 mt-4">
             <MorphingMessagePopover />
           </div>
         </div>

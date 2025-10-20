@@ -43,7 +43,7 @@ export const stickyNotesData = [
     title: "Ideas",
     content:
       "• Dark mode toggle\n• Custom themes\n• Note categories\n• Export notes",
-    position: { top: 550, left: 100 },
+    position: { top: 750, left: 1440 },
     size: { width: 200, height: 150 },
     bgColor: "#4ECDC4",
     textColor: "#FFFFFF",

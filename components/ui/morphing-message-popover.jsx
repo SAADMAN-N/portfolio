@@ -1,32 +1,19 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useForm, ValidationError } from "@formspree/react";
 import { cn } from "@/lib/utils";
 
 export function MorphingMessagePopover() {
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [state, handleSubmit] = useForm("xpwynkgy");
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // TODO: Implement message sending functionality
-    console.log("Message data:", formData);
-
-    // Reset form
-    setFormData({ name: "", email: "", message: "" });
-    setIsOpen(false);
-  };
+  // Close form after successful submission
+  if (state.succeeded) {
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 2000); // Close after 2 seconds
+  }
 
   return (
     <div className="relative z-50">
@@ -52,38 +39,50 @@ export function MorphingMessagePopover() {
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ type: "spring", bounce: 0.1, duration: 0.4 }}
           >
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-1">
               {/* Name Input */}
               <input
                 id="name"
+                name="name"
                 type="text"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                className="w-full pl-1 pr-3 py-2 bg-transparent text-zinc-400 placeholder-zinc-400 focus:outline-none text-sm rounded"
+                className="w-full pl-1 pr-3 py-1 bg-transparent text-zinc-400 placeholder-white focus:outline-none text-sm rounded"
                 placeholder="Your name"
                 required
+              />
+              <ValidationError
+                prefix="Name"
+                field="name"
+                errors={state.errors}
               />
 
               {/* Email Input */}
               <input
                 id="email"
+                name="email"
                 type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="w-full pl-1 pr-3 py-2 bg-transparent text-zinc-400 placeholder-zinc-400 focus:outline-none text-sm rounded"
+                className="w-full pl-1 pr-3 py-1 bg-transparent text-zinc-400 placeholder-black-500 focus:outline-none text-sm rounded"
                 placeholder="your.email@example.com"
                 required
+              />
+              <ValidationError
+                prefix="Email"
+                field="email"
+                errors={state.errors}
               />
 
               {/* Message Textarea */}
               <textarea
                 id="message"
-                value={formData.message}
-                onChange={(e) => handleInputChange("message", e.target.value)}
+                name="message"
                 rows={4}
-                className="w-full pl-1 pr-3 py-2 bg-transparent text-zinc-400 placeholder-zinc-400 focus:outline-none resize-none text-sm rounded"
-                placeholder="What would you like to say?"
+                className="w-full pl-1 pr-3 py-5 bg-transparent text-white-100 placeholder-zinc-400 focus:outline-none resize-none text-sm rounded"
+                placeholder="Hey Sharf, ..."
                 required
+              />
+              <ValidationError
+                prefix="Message"
+                field="message"
+                errors={state.errors}
               />
 
               {/* Submit Button */}
@@ -91,15 +90,20 @@ export function MorphingMessagePopover() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="px-4 py-2 text-white hover:text-gray-300 transition-colors duration-200"
+                  className="px-1 py-2 text-white hover:text-gray-300 transition-colors duration-200"
                 >
                   ←
                 </button>
                 <button
                   type="submit"
-                  className="px-2 bg-transparent text-white text-xs font-medium rounded-lg transition-colors duration-200 hover:text-gray-300  "
+                  disabled={state.submitting}
+                  className="px-2 bg-transparent text-white text-xs font-medium rounded-lg transition-colors duration-200 hover:text-gray-300 disabled:opacity-50"
                 >
-                  Submit
+                  {state.submitting
+                    ? "Sending..."
+                    : state.succeeded
+                      ? "Sent! ✓"
+                      : "Submit"}
                 </button>
               </div>
             </form>
