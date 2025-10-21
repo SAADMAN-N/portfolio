@@ -39,7 +39,12 @@ export default function Menubar({ onTidy, onCreateStickyNote }) {
         <span className="underline text-black font-semibold underline-offset-2">
           Sharf's portfolio
         </span>
-        <button className="text-gray-950 hover:underline">Resume</button>
+        <button
+          onClick={() => window.open("/resume.pdf", "_blank")}
+          className="text-gray-950 hover:underline"
+        >
+          Resume
+        </button>
         <button
           onClick={onCreateStickyNote}
           className="text-gray-950 hover:underline"
