@@ -17,12 +17,17 @@ export const metadata = {
   title: "Sharf's Portfolio",
   description:
     "This is a developer portfolio created by and for Sharfuzzaman Noor Sadman.",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
-      <body className="overflow-hidden">
+      <body className="overflow-hidden" suppressHydrationWarning={true}>
         <div
           className="
             relative
