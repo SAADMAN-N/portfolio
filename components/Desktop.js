@@ -126,6 +126,10 @@ export default function Desktop() {
     try {
       const savedNotes = localStorage.getItem("stickyNotes");
       console.log("Loading sticky notes from localStorage:", savedNotes);
+
+      // Force reset to use updated data file (remove this line after deployment)
+      localStorage.removeItem("stickyNotes");
+
       if (savedNotes) {
         const parsedNotes = JSON.parse(savedNotes);
         console.log("Parsed notes:", parsedNotes);
@@ -421,6 +425,8 @@ export default function Desktop() {
           // Clear saved positions and reapply default top-right stacking
           try {
             localStorage.removeItem("desktopPositions");
+            // Also clear saved sticky notes so defaults from data file are reapplied
+            localStorage.removeItem("stickyNotes");
           } catch (_e) {}
           // Re-run initializer logic by computing defaults again
           const vw = typeof window !== "undefined" ? window.innerWidth : 1920;
@@ -447,6 +453,11 @@ export default function Desktop() {
               return { ...it, position: { top, left } };
             })
           );
+
+          // Reset sticky notes to their initial positions/content from data file
+          // Note: we intentionally use the source data rather than current state
+          // so that any manual edits are discarded when tidying.
+          setStickyNotes(stickyNotesData);
         }}
         onCreateStickyNote={handleCreateStickyNote}
       />
@@ -566,14 +577,13 @@ export default function Desktop() {
         />
         <div className="relative w-full h-full rounded-xl bg-black p-4 flex flex-col justify-between text-white">
           <div className="flex items-center mb-2">
-            <div
-              className="w-3 h-3 rounded-full bg-green-500 mr-2 animate-pulse ring-2 ring-green-400/30 ring-offset-2 ring-offset-black"
-              style={{
-                boxShadow:
-                  "0 0 10px rgba(34, 197, 94, 0.6), 0 0 20px rgba(34, 197, 94, 0.4)",
-              }}
-            ></div>
-            <span className="text-lg font-semibold">Sharf</span>
+            <div className="relative ml-0 mr-1 h-4 w-4 flex items-center justify-center">
+              <span className="absolute h-2.5 w-2.5 rounded-full bg-green-400 opacity-75 animate-ping"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500 ring-3 ring-green-400/30 ring-offset-2 ring-offset-transparent"></span>
+            </div>
+            <span className="text-lg font-semibold">
+              Sharfuzzaman Noor Sadman
+            </span>
           </div>
 
           <div className="flex-1 flex flex-col">
@@ -599,8 +609,8 @@ export default function Desktop() {
             </div>
           </div>
 
-          {/* Message Popover */}
-          <div className="flex justify-end pb-2 pr-0 mt-4">
+          {/* Message Popover - reserve space to prevent layout shift when button hides */}
+          <div className="relative flex justify-end pb-2 pr-0 mt-4 h-7">
             <MorphingMessagePopover />
           </div>
         </div>
