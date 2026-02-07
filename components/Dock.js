@@ -1,6 +1,11 @@
 import DockIcon from "./DockIcon";
 
-export default function Dock({ onDesktopClick, onIMessageClick }) {
+export default function Dock({
+  onDesktopClick,
+  onFinderClick,
+  onIMessageClick,
+  onTrashClick,
+}) {
   return (
     <div className="w-full flex justify-center fixed bottom-4 left-0 right-0 z-[9999] ">
       <div
@@ -13,7 +18,13 @@ export default function Dock({ onDesktopClick, onIMessageClick }) {
           p-x-[10px] p-t p-[30px] p-b-[50px]"
         onClick={onDesktopClick}
       >
-        <div className="relative">
+        <div
+          className="relative"
+          onClick={(e) => {
+            e.stopPropagation();
+            onFinderClick?.();
+          }}
+        >
           <DockIcon isClickable={true} icon="/finder-icon.png" />
         </div>
 
@@ -79,10 +90,16 @@ export default function Dock({ onDesktopClick, onIMessageClick }) {
         </div>
 
         <div className="relative">
-          <DockIcon isClickable={true} icon="/photos-icon.png" />
+          <DockIcon isClickable={false} icon="/photos-icon.png" />
         </div>
 
-        <div className="relative">
+        <div
+          className="relative"
+          onClick={(e) => {
+            e.stopPropagation();
+            onTrashClick?.();
+          }}
+        >
           <DockIcon isClickable={true} icon="/trash-icon.png" />
         </div>
       </div>

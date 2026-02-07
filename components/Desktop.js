@@ -19,6 +19,7 @@ import WindowDesktop from "./WindowDesktop";
 import PhotoViewer from "./PhotoViewer";
 import AboutMe from "./AboutMe";
 import IMessage from "./iMessage";
+import Trash from "./Trash";
 import Reminders from "./Reminders";
 import StickyNote from "./StickyNote";
 import { GlowEffect } from "@/components/ui/glow-effect";
@@ -85,6 +86,8 @@ export default function Desktop() {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [isIMessageOpen, setIsIMessageOpen] = useState(false);
   const [isIMessageClosing, setIsIMessageClosing] = useState(false);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const [isTrashClosing, setIsTrashClosing] = useState(false);
 
   // Inspirational quotes for rotation
   const quotes = [
@@ -300,6 +303,11 @@ export default function Desktop() {
     });
   };
 
+  const handleFinderClick = useCallback(() => {
+    const projectsItem = desktopItems.find((i) => i.id === 3);
+    if (projectsItem) handleItemClick(projectsItem);
+  }, []);
+
   const handleIMessageClick = useCallback(() => {
     if (isIMessageOpen) {
       setIsIMessageClosing(true);
@@ -311,6 +319,18 @@ export default function Desktop() {
       setIsIMessageOpen(true);
     }
   }, [isIMessageOpen]);
+
+  const handleTrashClick = useCallback(() => {
+    if (isTrashOpen) {
+      setIsTrashClosing(true);
+      setTimeout(() => {
+        setIsTrashOpen(false);
+        setIsTrashClosing(false);
+      }, 200);
+    } else {
+      setIsTrashOpen(true);
+    }
+  }, [isTrashOpen]);
 
   const handleDesktopClick = (e) => {
     // Don't close windows if clicking on sticky notes or their children
@@ -343,6 +363,15 @@ export default function Desktop() {
       setTimeout(() => {
         setIsIMessageOpen(false);
         setIsIMessageClosing(false);
+      }, 200);
+    }
+
+    // Close Trash when clicking desktop
+    if (isTrashOpen) {
+      setIsTrashClosing(true);
+      setTimeout(() => {
+        setIsTrashOpen(false);
+        setIsTrashClosing(false);
       }, 200);
     }
   };
@@ -744,9 +773,15 @@ export default function Desktop() {
         <IMessage isClosing={isIMessageClosing} onClose={handleIMessageClick} />
       )}
 
+      {isTrashOpen && (
+        <Trash isClosing={isTrashClosing} onClose={handleTrashClick} />
+      )}
+
       <Dock
         onDesktopClick={handleDesktopClick}
+        onFinderClick={handleFinderClick}
         onIMessageClick={handleIMessageClick}
+        onTrashClick={handleTrashClick}
       />
     </div>
   );

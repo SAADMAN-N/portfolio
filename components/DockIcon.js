@@ -8,7 +8,11 @@ export default function DockIcon({
   height = 48,
 }) {
   return (
-    <div className="relative p-0 m-0 cursor-pointer">
+    <div
+      className={`relative p-0 m-0 cursor-pointer transition-transform duration-200 ease-out ${
+        isClickable ? "hover:scale-110 hover:-translate-y-1" : ""
+      }`}
+    >
       <Image src={icon} alt="Dock-apps-icon" width={width} height={height} />
       {isClickable && (
         <div
