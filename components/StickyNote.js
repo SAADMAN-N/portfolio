@@ -428,7 +428,18 @@ const StickyNote = memo(function StickyNote({
                 onClick={handleContentClick}
                 onMouseDown={handleStopPropagation}
               >
-                {noteContent}
+                {noteContent.split(/(`[^`]+`)/g).map((part, i) =>
+                  part.startsWith("`") && part.endsWith("`") ? (
+                    <code
+                      key={i}
+                      className="font-mono text-[0.7rem] px-1 rounded bg-black/10"
+                    >
+                      {part.slice(1, -1)}
+                    </code>
+                  ) : (
+                    part
+                  )
+                )}
               </p>
             )}
             {type === "visitor" && author && (

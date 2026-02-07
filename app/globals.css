@@ -4,6 +4,13 @@
 
 @import "tw-animate-css";
 
+/* Mermaid diagram sizing and transparent background */
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
 /* Custom scrollbar styles */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;

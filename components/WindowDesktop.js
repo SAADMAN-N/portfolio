@@ -6,6 +6,12 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { LinkPreview } from "@/components/ui/link-preview";
 import StickyNote from "@/components/StickyNote";
+import dynamic from "next/dynamic";
+
+const MermaidDiagram = dynamic(
+  () => import("@/components/MermaidDiagram").then((mod) => mod.default),
+  { ssr: false }
+);
 
 export default function WindowDesktop({
   title,
@@ -194,83 +200,26 @@ ${project.learning}`}
 
         {/* Performance Metrics + Project Highlights - Side by Side */}
         <div className="grid grid-cols-3 gap-6">
-          {/* Performance Metrics or Bug Sticky Note */}
-          {project.id === 1 ? (
-            // Portfolio project: Show "Biggest Bug I faced" sticky note instead of performance metrics
+          {/* Biggest Bug sticky note OR Performance Metrics */}
+          {project.biggestBug ? (
             <div className="relative col-span-1 pb-8">
               <StickyNote
-                id="project-bug-note"
+                id={`project-bug-note-${project.id}`}
                 title="🐛 Biggest Bug I faced"
                 content={`• The Challenge:
-Loading 38 high-res photos in WebGL carousel caused black screen and animation lag
+${project.biggestBug.challenge}
 
 • The Problem:
-WebGL texture atlas creation was too heavy for initial load, causing performance issues
+${project.biggestBug.problem}
 
 • The Solution:
-Implemented smart progressive loading - 6 curated photos first, then 12 more in background
+${project.biggestBug.solution}
 
 • Key Learning:
-WebGL optimization requires careful batching and progressive loading strategies`}
-                position={{ top: -20, left: 0 }}
+${project.biggestBug.learning}`}
+                position={{ top: 0, left: 0 }}
                 size={bugNoteSize}
-                bgColor="#FF6B6B"
-                textColor="#FFFFFF"
-                isEditable={false}
-                type="permanent"
-                isMinimized={isBugNoteMinimized}
-                onMinimize={handleMinimizeBugNote}
-                onUpdate={handleBugNoteUpdate}
-              />
-            </div>
-          ) : project.id === 2 ? (
-            // SwiftToken project: Show "Biggest Bug I faced" sticky note instead of performance metrics
-            <div className="relative col-span-1 pb-8">
-              <StickyNote
-                id="swifttoken-bug-note"
-                title="🐛 Biggest Bug I faced"
-                content={`• The Challenge:
-Memecoins were being minted successfully but metadata (image/name) wasn't attaching properly
-
-• The Problem:
-Struggled with complex Solana SDK documentation and Metaplex metadata configuration - tokens existed but appeared as "Unknown Token" without proper branding
-
-• The Solution:
-Deep-dived into Metaplex documentation, implemented proper metadata URI handling, and created robust validation for image uploads and metadata formatting
-
-• Key Learning:
-Solana's metadata system requires precise configuration - learned the hard way that blockchain success means nothing without proper metadata attachment`}
-                position={{ top: -20, left: 0 }}
-                size={bugNoteSize}
-                bgColor="#4A90E2"
-                textColor="#FFFFFF"
-                isEditable={false}
-                type="permanent"
-                isMinimized={isBugNoteMinimized}
-                onMinimize={handleMinimizeBugNote}
-                onUpdate={handleBugNoteUpdate}
-              />
-            </div>
-          ) : project.id === 3 ? (
-            // InterVue project: Show "Biggest Bug I faced" sticky note instead of performance metrics
-            <div className="relative col-span-1 pb-8">
-              <StickyNote
-                id="intervue-bug-note"
-                title="🐛 Biggest Bug I faced"
-                content={`• The Challenge:
-Creating a seamless voice processing pipeline - user speech → transcription → Gemini AI → Vapi voice response
-
-• The Problem:
-Race conditions were causing chaos - multiple audio chunks processing simultaneously, API calls overlapping, and state updates conflicting. Users would get mixed responses from different conversation threads
-
-• The Solution:
-Implemented request queuing, audio chunk sequencing, and proper async/await patterns with cancellation tokens to prevent overlapping API calls
-
-• Key Learning:
-Real-time voice AI requires bulletproof pipeline architecture - race conditions can turn a simple conversation into a confusing mess of mixed responses`}
-                position={{ top: -20, left: 0 }}
-                size={bugNoteSize}
-                bgColor="#FF9500"
+                bgColor={project.biggestBug.bgColor || "#6B7280"}
                 textColor="#FFFFFF"
                 isEditable={false}
                 type="permanent"
@@ -280,7 +229,6 @@ Real-time voice AI requires bulletproof pipeline architecture - race conditions 
               />
             </div>
           ) : (
-            // Other projects: Show performance metrics as usual
             project.metrics && (
               <div className="space-y-4 col-span-1 mt-0">
                 <h3 className="text-lg font-semibold text-[#e5e5ea]">
@@ -326,6 +274,20 @@ Real-time voice AI requires bulletproof pipeline architecture - race conditions 
             </div>
           )}
         </div>
+
+        {/* Codebase Indexing Pipeline - Full width, below everything (Mach only) */}
+        {project.diagrams && project.diagrams.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-[#2c2c2e]">
+            {project.diagrams.map((diagram) => (
+              <MermaidDiagram
+                key={diagram.id}
+                id={diagram.id}
+                title={diagram.title}
+                code={diagram.code}
+              />
+            ))}
+          </div>
+        )}
       </div>
     );
   };
@@ -461,7 +423,7 @@ Real-time voice AI requires bulletproof pipeline architecture - race conditions 
 
           <div className="flex-1">
             <div
-              className={`text-[14px] font-medium ${
+              className={`text-[18px] font-bold ${
                 (selectedProject && selectedProject.title === "InterVue") ||
                 title === "InterVue"
                   ? "text-white"

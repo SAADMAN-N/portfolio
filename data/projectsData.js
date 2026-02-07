@@ -28,7 +28,7 @@ export const projectsData = [
     learning:
       "Mastered advanced React patterns including context separation, performance optimization with React.memo, complex state management for desktop-like interactions, and localStorage integration for user experience persistence",
     githubUrl: "https://github.com/SAADMAN-N/portfolio-mac",
-    liveUrl: "https://sharfsadman.dev",
+    liveUrl: "https://sharfuzzaman.dev",
     status: "Completed",
     metrics: {
       performance: "95+ Lighthouse Score",
@@ -44,6 +44,17 @@ export const projectsData = [
       "localStorage state persistence",
       "Glassmorphic design implementation",
     ],
+    biggestBug: {
+      challenge:
+        "Loading 38 high-res photos in WebGL carousel caused black screen and animation lag",
+      problem:
+        "WebGL texture atlas creation was too heavy for initial load, causing performance issues",
+      solution:
+        "Implemented smart progressive loading - 6 curated photos first, then 12 more in background",
+      learning:
+        "WebGL optimization requires careful batching and progressive loading strategies",
+      bgColor: "#FF6B6B",
+    },
   },
   {
     id: 2,
@@ -91,6 +102,17 @@ export const projectsData = [
       "Phantom Wallet authentication",
       "No-code token deployment system",
     ],
+    biggestBug: {
+      challenge:
+        "Memecoins were being minted successfully but metadata (image/name) wasn't attaching properly",
+      problem:
+        "Struggled with complex Solana SDK documentation and Metaplex metadata configuration - tokens existed but appeared as 'Unknown Token' without proper branding",
+      solution:
+        "Deep-dived into Metaplex documentation, implemented proper metadata URI handling, and created robust validation for image uploads and metadata formatting",
+      learning:
+        "Solana's metadata system requires precise configuration - learned the hard way that blockchain success means nothing without proper metadata attachment",
+      bgColor: "#4A90E2",
+    },
   },
   {
     id: 3,
@@ -136,6 +158,104 @@ export const projectsData = [
       "Firebase authentication & Firestore",
       "Low-latency bidirectional communication",
       "AI-powered interview evaluation system",
+    ],
+    biggestBug: {
+      challenge:
+        "Creating a seamless voice processing pipeline - user speech → transcription → Gemini AI → Vapi voice response",
+      problem:
+        "Race conditions were causing chaos - multiple audio chunks processing simultaneously, API calls overlapping, and state updates conflicting. Users would get mixed responses from different conversation threads",
+      solution:
+        "Implemented request queuing, audio chunk sequencing, and proper async/await patterns with cancellation tokens to prevent overlapping API calls",
+      learning:
+        "Real-time voice AI requires bulletproof pipeline architecture - race conditions can turn a simple conversation into a confusing mess of mixed responses",
+      bgColor: "#FF9500",
+    },
+  },
+  {
+    id: 4,
+    title: "Mach",
+    bio: "Next.js 15 • React 19 • TypeScript • tRPC • Prisma • Tailwind • LangChain • Gemini • pgvector",
+    icon: "/projects-icon.svg",
+    screenshot: "/mach-project-banner.jpeg",
+    description:
+      "AI-powered codebase assistant that indexes GitHub repositories, generates semantic embeddings, and answers questions about code using RAG. Built end-to-end pipeline for project creation, code summarization, vector storage, and similarity search. Includes commit summarization, meeting analysis, and credit-based billing.",
+    technologies: [
+      "Next.js 15",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS",
+      "shadcn/ui",
+      "tRPC",
+      "Prisma",
+      "PostgreSQL",
+      "pgvector",
+      "Clerk",
+      "LangChain",
+      "OpenRouter",
+      "Google Gemini",
+      "Octokit",
+      "Stripe",
+      "AssemblyAI",
+      "Firebase",
+    ],
+    features: [
+      "RAG over full codebase with semantic search",
+      "AI Q&A with file references and citations",
+      "Automated commit summarization",
+      "GitHub repo indexing with credit checks",
+      "Meeting transcription and action items",
+      "Vector embeddings with pgvector",
+    ],
+    challenge:
+      "Building a RAG system from scratch with a stack I hadn't used before—tRPC, embeddings, pgvector, and raw SQL in Prisma. Few tutorials existed, and every layer (RAG, similarity search, vector storage) was new. Verifying whether embeddings were actually being generated and stored correctly was difficult.",
+    solution:
+      "Designed full pipeline: LangChain GithubRepoLoader for repo loading, Gemini for per-file code summarization, gemini-embedding-001 for embeddings, and Prisma raw queries to store vectors in pgvector. Added optional GitHub PAT for rate limits. Iterative debugging with logging and direct DB inspection to validate each step.",
+    learning:
+      "End-to-end RAG architecture—loading docs, summarizing, embedding, storing in pgvector, and similarity search. First time with tRPC structure and procedures. Prisma raw queries for Postgres-specific types like vector. Learned to debug systems where the output isn't directly visible—embeddings and vector pipelines require step-by-step verification instead of expecting immediate feedback.",
+    githubUrl: "https://github.com/SAADMAN-N/Mach",
+    liveUrl: "https://mach-six.vercel.app",
+    status: "Completed",
+    metrics: {
+      embeddings: "Per-file semantic indexing",
+      stack: "16+ technologies integrated",
+      pipeline: "Load → Summarize → Embed → Store → Query",
+    },
+    highlights: [
+      "First RAG implementation from scratch",
+      "tRPC + Prisma + pgvector integration",
+      "LangChain + Gemini embedding pipeline",
+      "GitHub repo indexing with rate limit handling",
+      "Raw SQL for vector column updates",
+      "Semantic code search with citations",
+    ],
+    biggestBug: {
+      challenge:
+        "Embeddings weren't showing up in search—couldn't tell if they were generated, stored, or retrieved correctly",
+      problem:
+        "Prisma raw query for updating the vector column `$executeRaw with ::vector cast` wasn't working for a long time. No visibility into the pipeline—summaries and embeddings are invisible, so debugging was guesswork.",
+      solution:
+        "Fixed raw query syntax and parameter binding for Postgres vector type. Added logging at each stage. Inspected DB directly (SELECT on SourceCodeEmbedding) to confirm vectors were written. Built verification mindset: validate generation → storage → retrieval separately.",
+      learning:
+        "Debugging vector pipelines requires checking each stage in isolation. Prisma raw queries need careful handling for Postgres-specific types. When the system is opaque, visibility tools (logs, DB inspection, small test queries) are essential.",
+      bgColor: "#6366F1",
+    },
+    diagrams: [
+      {
+        id: "indexing",
+        title: "Codebase Indexing Pipeline",
+        code: `graph TD
+    A[GitHub Repository] --> B[LangChain GithubRepoLoader]
+    B --> C[Recursive File Loading]
+    C --> D[Filter Lock Files]
+    D --> E[Generate File Summaries<br/>OpenRouter AI]
+    E --> F[Create Embeddings<br/>Google Gemini 768-dim]
+    F --> G[Store in PostgreSQL<br/>pgvector extension]
+    G --> H[Ready for Semantic Search]
+    
+    style A fill:#24292e,color:#fff
+    style G fill:#336791,color:#fff
+    style H fill:#22c55e,color:#fff`,
+      },
     ],
   },
 ];
