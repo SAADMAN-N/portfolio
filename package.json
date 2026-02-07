@@ -23,6 +23,7 @@
     "cobe": "^0.6.5",
     "gl-matrix": "^3.4.4",
     "lucide-react": "^0.546.0",
+    "mermaid": "^11.12.2",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.0",
     "motion": "^12.23.22",
