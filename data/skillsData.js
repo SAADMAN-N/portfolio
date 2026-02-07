@@ -2,7 +2,7 @@ export const skillsData = [
   {
     src: "https://devicon-website.vercel.app/api/npm/original-wordmark.svg",
     fallback: "npm",
-    tooltip: "npm Package Manager",
+    tooltip: "npm Package Mananger",
   },
   {
     src: "https://devicon-website.vercel.app/api/jest/plain.svg",

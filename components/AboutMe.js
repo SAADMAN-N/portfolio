@@ -215,8 +215,10 @@ export default function AboutMe({
                   href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
                 />
                 <AvatarGroup
-                  className="absolute top-0 p-[10px] mt-3"
+                  className="pl-2 pt-6"
+                  sideOffset={10}
                   side="bottom"
+                  alignOffset={10}
                 >
                   {dbData.map((avatar, index) => (
                     <Avatar key={index}>

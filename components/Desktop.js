@@ -26,6 +26,8 @@ import { GlowEffect } from "@/components/ui/glow-effect";
 import { MorphingMessagePopover } from "@/components/ui/morphing-message-popover";
 import { aboutMeWindows } from "@/data/aboutMeWindows";
 import { stickyNotesData, getApprovedNotes } from "@/data/stickyNotesData";
+import MusicPlayerCard from "@/components/ruixen/music-player-card";
+import { musicTracks } from "@/data/musicPlayerData";
 
 function DraggableItem({ item, onItemClick }) {
   const { setNodeRef, listeners, attributes, transform, isDragging } =
@@ -614,7 +616,7 @@ export default function Desktop() {
       <div
         className="absolute"
         style={{
-          top: "150px",
+          top: "90px",
           left: "950px",
           width: "300px",
           height: "250px",
@@ -691,6 +693,21 @@ export default function Desktop() {
         isMinimized={isRemindersMinimized}
         onMinimize={handleRemindersMinimize}
       />
+
+      {/* Music Player Card - positioned to avoid overlap with Todo List (#450) and Ideas (#450) */}
+      <div
+        className="absolute z-20"
+        style={{ top: 350, left: 1000 }}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+        onPointerUp={(e) => e.stopPropagation()}
+      >
+        <div className="flex min-h-[400px] w-full items-center justify-center px-8">
+          <MusicPlayerCard tracks={musicTracks} />
+        </div>
+      </div>
 
       {/* Desktop Windows - rendered after notes for proper layering */}
       {desktopItems.map((item) => {
