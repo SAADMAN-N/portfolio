@@ -30,6 +30,24 @@
   background: #718096;
 }
 
+/* iMessage dark theme scrollbar */
+.imessage-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.imessage-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.imessage-scrollbar::-webkit-scrollbar-thumb {
+  background: #48484a;
+  border-radius: 4px;
+}
+
+.imessage-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #636366;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

@@ -1,6 +1,6 @@
 import DockIcon from "./DockIcon";
 
-export default function Dock({ onDesktopClick }) {
+export default function Dock({ onDesktopClick, onIMessageClick }) {
   return (
     <div className="w-full flex justify-center fixed bottom-4 left-0 right-0 z-[9999] ">
       <div
@@ -34,7 +34,13 @@ export default function Dock({ onDesktopClick }) {
           <DockIcon isClickable={true} icon="/notes-icon.png" />
         </div>
 
-        <div className="relative">
+        <div
+          className="relative"
+          onClick={(e) => {
+            e.stopPropagation();
+            onIMessageClick?.();
+          }}
+        >
           <DockIcon isClickable={true} icon="/messages-icon.png" />
         </div>
 

@@ -18,6 +18,7 @@ import {
 import WindowDesktop from "./WindowDesktop";
 import PhotoViewer from "./PhotoViewer";
 import AboutMe from "./AboutMe";
+import IMessage from "./iMessage";
 import Reminders from "./Reminders";
 import StickyNote from "./StickyNote";
 import { GlowEffect } from "@/components/ui/glow-effect";
@@ -82,6 +83,8 @@ export default function Desktop() {
   const [minimizedNotes, setMinimizedNotes] = useState(new Set());
   const [isRemindersMinimized, setIsRemindersMinimized] = useState(false);
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [isIMessageOpen, setIsIMessageOpen] = useState(false);
+  const [isIMessageClosing, setIsIMessageClosing] = useState(false);
 
   // Inspirational quotes for rotation
   const quotes = [
@@ -297,6 +300,18 @@ export default function Desktop() {
     });
   };
 
+  const handleIMessageClick = useCallback(() => {
+    if (isIMessageOpen) {
+      setIsIMessageClosing(true);
+      setTimeout(() => {
+        setIsIMessageOpen(false);
+        setIsIMessageClosing(false);
+      }, 200);
+    } else {
+      setIsIMessageOpen(true);
+    }
+  }, [isIMessageOpen]);
+
   const handleDesktopClick = (e) => {
     // Don't close windows if clicking on sticky notes or their children
     if (e.target.closest("[data-sticky-note]")) {
@@ -320,6 +335,15 @@ export default function Desktop() {
         setOpenWindows({});
         setClosingWindows({});
       }, 200); // Match the CSS transition duration
+    }
+
+    // Close iMessage when clicking desktop
+    if (isIMessageOpen) {
+      setIsIMessageClosing(true);
+      setTimeout(() => {
+        setIsIMessageOpen(false);
+        setIsIMessageClosing(false);
+      }, 200);
     }
   };
 
@@ -716,7 +740,14 @@ export default function Desktop() {
         );
       })}
 
-      <Dock onDesktopClick={handleDesktopClick} />
+      {isIMessageOpen && (
+        <IMessage isClosing={isIMessageClosing} onClose={handleIMessageClick} />
+      )}
+
+      <Dock
+        onDesktopClick={handleDesktopClick}
+        onIMessageClick={handleIMessageClick}
+      />
     </div>
   );
 }

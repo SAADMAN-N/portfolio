@@ -1,0 +1,92 @@
+export const conversations = [
+  {
+    id: "1",
+    name: "Alex",
+    avatar: null,
+    lastMessage: "nope 😢",
+    lastDate: "1/27/26",
+    isActive: true,
+    messages: [
+      { id: "t1", type: "timestamp", text: "Today, 2:34 PM" },
+      {
+        id: "1",
+        type: "incoming",
+        text: "Hey! Any updates on the internship?",
+      },
+      { id: "2", type: "outgoing", text: "nope 😢" },
+      { id: "3", type: "incoming", text: "aw that sucks" },
+      {
+        id: "4",
+        type: "outgoing",
+        text: "yeah still waiting to hear back from a few",
+      },
+      { id: "5", type: "incoming", text: "you got this!!" },
+      { id: "6", type: "outgoing", text: "thanks 🙏" },
+    ],
+  },
+  {
+    id: "2",
+    name: "Mom",
+    avatar: null,
+    lastMessage: "remember to book my flight",
+    lastDate: "1/26/26",
+    isActive: false,
+    messages: [
+      { id: "t1", type: "timestamp", text: "Yesterday, 4:15 PM" },
+      {
+        id: "1",
+        type: "incoming",
+        text: "Don't forget to book your flight for spring break!",
+      },
+      { id: "2", type: "outgoing", text: "oh right, I'll do it tonight" },
+      {
+        id: "3",
+        type: "incoming",
+        text: "Prices go up if you wait too long",
+      },
+      { id: "4", type: "outgoing", text: "ok ok I'll book it now 👍" },
+      { id: "5", type: "incoming", text: "Good. Let me know when it's done" },
+      { id: "6", type: "outgoing", text: "will do" },
+    ],
+  },
+  {
+    id: "3",
+    name: "Study Group",
+    avatar: null,
+    lastMessage: "Meeting at the library at 3pm?",
+    lastDate: "1/26/26",
+    isActive: false,
+    messages: [
+      { id: "1", type: "incoming", text: "Meeting at the library at 3pm?" },
+      { id: "2", type: "outgoing", text: "I'll be there" },
+    ],
+  },
+  {
+    id: "4",
+    name: "Rahul",
+    avatar: null,
+    lastMessage: "Congrats on the callback! 🎉",
+    lastDate: "1/25/26",
+    isActive: false,
+    messages: [
+      { id: "1", type: "incoming", text: "Congrats on the callback! 🎉" },
+      { id: "2", type: "outgoing", text: "thanks!" },
+    ],
+  },
+  {
+    id: "5",
+    name: "Sarah",
+    avatar: null,
+    lastMessage: "Good luck with your interview tomorrow!",
+    lastDate: "1/24/26",
+    isActive: false,
+    messages: [
+      {
+        id: "1",
+        type: "incoming",
+        text: "Good luck with your interview tomorrow!",
+      },
+      { id: "2", type: "outgoing", text: "thank you!! 🙏" },
+    ],
+  },
+];
