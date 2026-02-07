@@ -630,7 +630,7 @@ export default function Desktop() {
           scale={1.01}
           duration={4}
         />
-        <div className="relative w-full h-full rounded-xl bg-black p-4 flex flex-col justify-between text-white overflow-hidden">
+        <div className="relative w-full h-full rounded-xl bg-black p-4 flex flex-col justify-between text-white overflow-hidden select-none">
           {/* Background stickers */}
           <div className="absolute top-6 right-2 rotate-2 pointer-events-none">
             <img
@@ -639,7 +639,7 @@ export default function Desktop() {
               className="w-40 h-40 object-contain"
             />
           </div>
-          <div className="absolute -bottom-[20px] left-2 -rotate-3 pointer-events-none">
+          <div className="absolute -bottom-[20px] left-2 -rotate-3 pointer-events-none select-none">
             <img
               src="/working-image.png"
               alt="Working"
@@ -648,7 +648,7 @@ export default function Desktop() {
           </div>
 
           <div className="flex items-center mb-2">
-            <div className="relative ml-0 mr-1 h-4 w-4 flex items-center justify-center">
+            <div className="relative ml-0 mr-1 h-4 w-4 flex items-center justify-center select-none">
               <span className="absolute h-2.5 w-2.5 rounded-full bg-green-400 opacity-75 animate-ping"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500 ring-3 ring-green-400/30 ring-offset-2 ring-offset-transparent"></span>
             </div>
