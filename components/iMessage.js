@@ -22,39 +22,6 @@ const SearchIcon = () => (
   </svg>
 );
 
-const PhoneIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="text-[#8E8E93]"
-  >
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-  </svg>
-);
-
-const VideoIcon = () => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="text-[#8E8E93]"
-  >
-    <path d="m22 8-6 4 6 4V8Z" />
-    <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
-  </svg>
-);
-
 const PlusIcon = () => (
   <svg
     width="22"
@@ -109,22 +76,6 @@ const EmojiIcon = () => (
   </svg>
 );
 
-const ChevronIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="text-[#8E8E93]"
-  >
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
-
 const PersonIcon = () => (
   <svg
     width="24"
@@ -140,6 +91,23 @@ const PersonIcon = () => (
     <circle cx="12" cy="12" r="10" />
     <circle cx="12" cy="10" r="3" />
     <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+  </svg>
+);
+
+const ChevronRightIcon = () => (
+  <svg
+    width="11"
+    height="11"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="text-[#8E8E93] opacity-90"
+    aria-hidden
+  >
+    <path d="m9 18 6-6-6-6" />
   </svg>
 );
 
@@ -178,17 +146,22 @@ function TrafficLights({ onClose }) {
   );
 }
 
-// Message bubble
+const imessageFont =
+  'system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif';
+
 function MessageBubble({ type, text }) {
   const isOutgoing = type === "outgoing";
   return (
     <div
-      className={`flex ${isOutgoing ? "justify-end" : "justify-start"} mb-1`}
+      className={`flex ${isOutgoing ? "justify-end" : "justify-start"} mb-0.5`}
     >
       <div
-        className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm break-words leading-relaxed ${
-          isOutgoing ? "bg-[#007AFF] text-white" : "bg-[#3A3A3C] text-[#F2F2F7]"
+        className={`max-w-[78%] break-words px-[11px] py-[7px] text-[15px] leading-[1.35] tracking-[-0.015em] ${
+          isOutgoing
+            ? "rounded-tl-[18px] rounded-tr-[18px] rounded-br-none rounded-bl-[18px] bg-[#007AFF] text-white"
+            : "rounded-tl-[18px] rounded-tr-[18px] rounded-br-[18px] rounded-bl-none bg-[#3A3A3C] text-[#F2F2F7]"
         }`}
+        style={{ fontFamily: imessageFont }}
       >
         {text}
       </div>
@@ -205,7 +178,7 @@ export default function IMessage({ isClosing = false, onClose }) {
 
   return (
     <div
-      className={`fixed overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] rounded-2xl flex flex-col ${
+      className={`fixed overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] rounded-3xl flex flex-col ${
         isClosing ? "opacity-0" : "opacity-100"
       }`}
       style={{
@@ -219,6 +192,7 @@ export default function IMessage({ isClosing = false, onClose }) {
           ? "translate(-50%, -50%) scale(0.95)"
           : "translate(-50%, -50%)",
         backgroundColor: "#1C1C1E",
+        fontFamily: imessageFont,
         boxShadow:
           "0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.05)",
       }}
@@ -242,13 +216,13 @@ export default function IMessage({ isClosing = false, onClose }) {
           style={{ backgroundColor: "#1E1E1E" }}
         >
           {/* Search bar */}
-          <div className="p-2 shrink-0">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#2C2C2E]">
+          <div className="px-2.5 pb-2 pt-2 shrink-0">
+            <div className="flex items-center gap-2 rounded-[10px] bg-[#2C2C2E]/90 px-2.5 py-1.5">
               <SearchIcon />
               <input
                 type="text"
                 placeholder="Search"
-                className="flex-1 bg-transparent text-sm text-white placeholder:text-[#8E8E93] outline-none"
+                className="flex-1 bg-transparent text-[13px] text-white placeholder:text-[#8E8E93] outline-none"
                 readOnly
               />
             </div>
@@ -256,121 +230,112 @@ export default function IMessage({ isClosing = false, onClose }) {
 
           {/* Conversation list */}
           <div className="flex-1 overflow-y-auto imessage-scrollbar min-h-0">
-            {conversations.map((conv) => (
-              <div
-                key={conv.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setSelectedId(conv.id)}
-                onKeyDown={(e) => e.key === "Enter" && setSelectedId(conv.id)}
-                className={`flex gap-3 px-3 py-2.5 cursor-pointer transition-colors ${
-                  conv.id === selectedId ? "bg-[#007AFF]" : "hover:bg-[#2C2C2E]"
-                }`}
-              >
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-[#3A3A3C] shrink-0 flex items-center justify-center">
-                  {conv.avatar ? (
-                    <Image
-                      src={conv.avatar}
-                      alt={conv.name}
-                      width={40}
-                      height={40}
-                      className="object-cover w-full h-full"
-                    />
-                  ) : (
-                    <PersonIcon />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-baseline gap-2">
-                    <span className="font-semibold truncate text-white">
-                      {conv.name}
-                    </span>
-                    {conv.lastDate && (
-                      <span
-                        className={`text-xs shrink-0 ${
-                          conv.id === selectedId
-                            ? "text-white/90"
-                            : "text-[#8E8E93]"
-                        }`}
-                      >
-                        {conv.lastDate}
-                      </span>
-                    )}
+            {conversations.map((conv) => {
+              const selected = conv.id === selectedId;
+              const showUnread = Boolean(conv.unread) && !selected;
+              return (
+                <div
+                  key={conv.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedId(conv.id)}
+                  onKeyDown={(e) => e.key === "Enter" && setSelectedId(conv.id)}
+                  className={`flex cursor-pointer items-center gap-2 px-2.5 py-2 transition-colors ${
+                    selected ? "bg-[#007AFF]" : "hover:bg-[#2C2C2E]/80"
+                  }`}
+                >
+                  <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex w-2.5 items-center justify-center">
+                      {showUnread ? (
+                        <span
+                          className="h-2 w-2 rounded-full bg-[#007AFF]"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </div>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3A3A3C]">
+                      {conv.avatar ? (
+                        <Image
+                          src={conv.avatar}
+                          alt={conv.name}
+                          width={36}
+                          height={36}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <PersonIcon />
+                      )}
+                    </div>
                   </div>
-                  <p
-                    className={`text-sm truncate mt-0.5 ${
-                      conv.id === selectedId
-                        ? "text-white/95"
-                        : "text-[#8E8E93]"
-                    }`}
-                  >
-                    {conv.lastMessage}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="truncate text-[13px] font-semibold text-white">
+                        {conv.name}
+                      </span>
+                      {conv.lastDate && (
+                        <span
+                          className={`shrink-0 text-[11px] tabular-nums ${
+                            selected ? "text-white/85" : "text-[#8E8E93]"
+                          }`}
+                        >
+                          {conv.lastDate}
+                        </span>
+                      )}
+                    </div>
+                    <p
+                      className={`mt-px truncate text-[12px] leading-tight ${
+                        selected ? "text-white/90" : "text-[#8E8E93]"
+                      }`}
+                    >
+                      {conv.lastMessage}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
         {/* Right Chat Panel */}
         <div
-          className="flex-1 flex flex-col min-w-0"
-          style={{ backgroundColor: "#18181B" }}
+          className="flex min-w-0 flex-1 flex-col"
+          style={{ backgroundColor: "#000000" }}
         >
-          {/* Chat header - macOS contact profile style */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#2C2C2E] shrink-0">
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#3A3A3C] shrink-0 flex items-center justify-center">
+          {/* Chat header — centered contact, frosted gradient (no hard divider) */}
+          <div className="flex shrink-0 justify-center bg-gradient-to-b from-black/95 via-black/55 to-transparent px-3 py-2 pb-3 backdrop-blur-xl backdrop-saturate-150 sm:px-4">
+            <div className="flex min-w-0 flex-col items-center justify-center gap-0.5 py-0.5 text-center">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#3A3A3C]">
                 {activeConversation?.avatar ? (
                   <Image
                     src={activeConversation.avatar}
                     alt={activeConversation.name}
-                    width={40}
-                    height={40}
-                    className="object-cover w-full h-full"
+                    width={36}
+                    height={36}
+                    className="h-full w-full object-cover"
                   />
                 ) : (
                   <PersonIcon />
                 )}
               </div>
-              <button
-                type="button"
-                className="flex items-center gap-1.5 hover:opacity-80 transition-opacity text-left min-w-0"
-              >
-                <span className="font-semibold text-white text-[15px] truncate">
+              <div className="flex items-center gap-0.5">
+                <span className="max-w-[200px] truncate text-[14px] font-semibold text-white">
                   {activeConversation?.name}
                 </span>
-                <ChevronIcon />
-              </button>
-              <span className="text-xs text-[#8E8E93] shrink-0 hidden sm:inline">
+                <ChevronRightIcon />
+              </div>
+              <span className="text-[10px] leading-tight text-[#8E8E93]">
                 Feb 23, 2025 at 10:56 PM
               </span>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                type="button"
-                className="p-2.5 hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Video call"
-              >
-                <VideoIcon />
-              </button>
-              <button
-                type="button"
-                className="p-2.5 hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Phone call"
-              >
-                <PhoneIcon />
-              </button>
             </div>
           </div>
 
           {/* Message area */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 imessage-scrollbar min-h-0">
+          <div className="imessage-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-3">
             {messages.map((msg) => {
               if (msg.type === "timestamp") {
                 return (
-                  <div key={msg.id} className="flex justify-center my-5">
-                    <span className="text-xs text-[#8E8E93] bg-[#2C2C2E]/80 px-3 py-1.5 rounded-full">
+                  <div key={msg.id} className="my-4 flex justify-center">
+                    <span className="rounded-full bg-[#2C2C2E]/90 px-3 py-1 text-[11px] font-medium text-[#8E8E93]">
                       {msg.text}
                     </span>
                   </div>
@@ -382,30 +347,33 @@ export default function IMessage({ isClosing = false, onClose }) {
             })}
           </div>
 
-          {/* Input bar */}
-          <div className="p-3 border-t border-[#2C2C2E] shrink-0">
-            <div className="flex items-center gap-2 bg-[#2C2C2E] rounded-2xl px-4 py-2.5">
+          {/* Input bar — pill field like macOS */}
+          <div className="shrink-0 border-t border-[#2C2C2E]/80 p-2.5">
+            <div className="flex items-center gap-1 rounded-full border border-white/[0.08] bg-[#1C1C1E] px-2 py-1.5 pl-2.5">
               <button
                 type="button"
-                className="p-1.5 hover:bg-white/10 rounded-full shrink-0 transition-colors"
+                className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/10"
+                aria-label="Apps"
               >
                 <PlusIcon />
               </button>
               <input
                 type="text"
                 placeholder="iMessage"
-                className="flex-1 bg-transparent text-sm text-white placeholder:text-[#8E8E93] outline-none py-1 min-w-0"
+                className="min-w-0 flex-1 bg-transparent py-1 text-[15px] text-white outline-none placeholder:text-[#8E8E93]"
                 readOnly
               />
               <button
                 type="button"
-                className="p-1.5 hover:bg-white/10 rounded-full shrink-0 transition-colors"
+                className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/10"
+                aria-label="Audio message"
               >
                 <MicIcon />
               </button>
               <button
                 type="button"
-                className="p-1.5 hover:bg-white/10 rounded-full shrink-0 transition-colors"
+                className="shrink-0 rounded-full p-1.5 transition-colors hover:bg-white/10"
+                aria-label="Emoji"
               >
                 <EmojiIcon />
               </button>

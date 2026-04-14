@@ -59,7 +59,7 @@ export default function Trash({ isClosing = false, onClose }) {
 
   return (
     <div
-      className={`fixed overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] rounded-2xl flex flex-col ${
+      className={`fixed overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] rounded-3xl flex flex-col ${
         isClosing ? "opacity-0" : "opacity-100"
       }`}
       style={{
@@ -91,7 +91,7 @@ export default function Trash({ isClosing = false, onClose }) {
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <div className="w-48 shrink-0 flex flex-col bg-[#1c1c1e] border-r border-[#2c2c2e] rounded-bl-2xl">
+        <div className="w-48 shrink-0 flex flex-col bg-[#1c1c1e] border-r border-[#2c2c2e] rounded-bl-3xl">
           <div className="flex flex-col pt-6 gap-4 px-2">
             <div className="text-[11px] tracking-wide pl-4 uppercase text-[#8e8e93]">
               Favorites
@@ -117,7 +117,7 @@ export default function Trash({ isClosing = false, onClose }) {
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#2C2C2E] rounded-br-2xl">
+        <div className="flex-1 flex flex-col min-w-0 bg-[#2C2C2E] rounded-br-3xl">
           {/* Toolbar */}
           <div className="h-12 shrink-0 flex items-center gap-2 px-4 border-b border-[#38383A]">
             <button

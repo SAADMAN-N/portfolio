@@ -27,7 +27,7 @@ export const stickyNotesData = [
       "• Springboot (1hr) ",
       "• APPLY!!!",
     ].join("\n"),
-    position: { top: 100, left: 450 },
+    position: { top: 200, left: 1288 },
     size: { width: 220, height: 250 },
     bgColor: "#FF6B6B",
     textColor: "#FFFFFF",
@@ -43,7 +43,7 @@ export const stickyNotesData = [
     title: "Ideas",
     content:
       "• Dark mode toggle\n• Custom themes\n• Note categories\n• Export notes",
-    position: { top: 500, left: 450 },
+    position: { top: 350, left: 200 },
     size: { width: 200, height: 150 },
     bgColor: "#4ECDC4",
     textColor: "#FFFFFF",
@@ -89,7 +89,7 @@ export const getPendingNotes = (notes) => {
 // Helper function to approve a note
 export const approveNote = (notes, noteId) => {
   return notes.map((note) =>
-    note.id === noteId ? { ...note, status: "approved" } : note
+    note.id === noteId ? { ...note, status: "approved" } : note,
   );
 };
 
@@ -101,7 +101,7 @@ export const rejectNote = (notes, noteId) => {
 // Helper function to update a sticky note
 export const updateStickyNote = (notes, noteId, updates) => {
   return notes.map((note) =>
-    note.id === noteId ? { ...note, ...updates } : note
+    note.id === noteId ? { ...note, ...updates } : note,
   );
 };
 

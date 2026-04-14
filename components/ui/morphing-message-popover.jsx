@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useLayoutEffect } from "react";
+import { useState, useRef, useLayoutEffect, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { useForm, ValidationError } from "@formspree/react";
@@ -7,6 +7,7 @@ export function MorphingMessagePopover() {
   const [isOpen, setIsOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef(null);
+  const popoverRef = useRef(null);
   const [state, handleSubmit] = useForm("xpwynkgy");
 
   // Update popover position when opening (useLayoutEffect to avoid flash)
@@ -20,19 +21,34 @@ export function MorphingMessagePopover() {
     }
   }, [isOpen]);
 
-  // Close form after successful submission
-  if (state.succeeded) {
-    setTimeout(() => {
+  useEffect(() => {
+    if (!state.succeeded) return;
+    const id = window.setTimeout(() => setIsOpen(false), 2000);
+    return () => clearTimeout(id);
+  }, [state.succeeded]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handlePointerDown(event) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (popoverRef.current?.contains(target)) return;
+      if (triggerRef.current?.contains(target)) return;
       setIsOpen(false);
-    }, 2000); // Close after 2 seconds
-  }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen]);
 
   const popoverContent = (
     <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
+          ref={popoverRef}
           key="content"
-          className="fixed bg-zinc-700 border border-gray-700 rounded-xl p-3 w-64 shadow-2xl"
+          className="fixed bg-zinc-700 border border-gray-700 rounded-2xl p-3 w-64 shadow-2xl"
           style={{
             top: position.top - 8,
             left: position.left,
@@ -50,7 +66,7 @@ export function MorphingMessagePopover() {
               id="name"
               name="name"
               type="text"
-              className="w-full pl-1 pr-3 py-1 bg-transparent text-zinc-400 placeholder-white focus:outline-none text-sm rounded"
+              className="w-full pl-1 pr-3 py-1 bg-transparent text-white placeholder:text-zinc-400 focus:outline-none text-sm rounded"
               placeholder="Your name"
               required
             />
@@ -61,7 +77,7 @@ export function MorphingMessagePopover() {
               id="email"
               name="email"
               type="email"
-              className="w-full pl-1 pr-3 py-1 bg-transparent text-zinc-400 placeholder-black-500 focus:outline-none text-sm rounded"
+              className="w-full pl-1 pr-3 py-1 bg-transparent text-white placeholder:text-zinc-400 focus:outline-none text-sm rounded"
               placeholder="your.email@example.com"
               required
             />
@@ -76,7 +92,7 @@ export function MorphingMessagePopover() {
               id="message"
               name="message"
               rows={4}
-              className="w-full pl-1 pr-3 py-5 bg-transparent text-white-100 placeholder-zinc-400 focus:outline-none resize-none text-sm rounded"
+              className="w-full pl-1 pr-3 py-5 bg-transparent text-white placeholder:text-zinc-400 focus:outline-none resize-none text-sm rounded"
               placeholder="Hey Sharf, ..."
               required
             />
@@ -117,7 +133,8 @@ export function MorphingMessagePopover() {
     <>
       <motion.button
         ref={triggerRef}
-        onClick={() => setIsOpen(true)}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
         className="px-3 py-1 h-fit bg-gray-700 hover:bg-gray-600 text-white text-xs font-medium rounded-lg transition-colors duration-200 border border-gray-600 cursor-pointer"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}

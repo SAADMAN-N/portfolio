@@ -8,6 +8,7 @@ export const remindersData = [
     completed: false,
     category: "today",
     priority: "high",
+    subtitle: "High priority",
   },
   {
     id: 2,
@@ -15,6 +16,7 @@ export const remindersData = [
     completed: false,
     category: "today",
     priority: "normal",
+    subtitle: "Daily · 1 hr",
   },
   {
     id: 3,
@@ -22,6 +24,7 @@ export const remindersData = [
     completed: false,
     category: "scheduled",
     priority: "normal",
+    subtitle: "Apr 14, 2026, 9:00 AM",
   },
   {
     id: 4,
@@ -29,6 +32,7 @@ export const remindersData = [
     completed: false,
     category: "scheduled",
     priority: "high",
+    subtitle: "Apr 15, 2026, 3:00 PM",
   },
   {
     id: 5,
@@ -36,6 +40,7 @@ export const remindersData = [
     completed: true,
     category: "today",
     priority: "high",
+    subtitle: "Completed",
   },
   {
     id: 6,
@@ -50,6 +55,7 @@ export const remindersData = [
     completed: false,
     category: "today",
     priority: "high",
+    subtitle: "Due Apr 20, 2026",
   },
   {
     id: 8,
@@ -57,6 +63,7 @@ export const remindersData = [
     completed: false,
     category: "scheduled",
     priority: "high",
+    subtitle: "Apr 18, 2026, 5:00 PM",
   },
 ];
 

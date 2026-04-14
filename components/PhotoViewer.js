@@ -1,6 +1,10 @@
 import SphereImageGrid from "./ui/image-sphere";
 import { useState, useEffect } from "react";
 
+const MAX_ACTIVE_IMAGES = 12;
+const EXTRA_ROTATION_STEP = 1;
+const EXTRA_ROTATION_INTERVAL_MS = 4500;
+
 // Smart loading strategy: Load curated images first for smooth animation, then load rest in background
 const curatedImages = [
   {
@@ -179,6 +183,21 @@ const additionalImages = [
   },
 ];
 
+const extraSlots = Math.max(0, MAX_ACTIVE_IMAGES - curatedImages.length);
+
+function getRotatingExtras(offset) {
+  if (extraSlots <= 0) return [];
+  if (additionalImages.length <= extraSlots) {
+    return additionalImages.slice(0, extraSlots);
+  }
+
+  const extras = [];
+  for (let i = 0; i < extraSlots; i += 1) {
+    extras.push(additionalImages[(offset + i) % additionalImages.length]);
+  }
+  return extras;
+}
+
 export default function PhotoViewer({
   top = "50vh",
   left = "50vw",
@@ -189,27 +208,45 @@ export default function PhotoViewer({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
-    // Start with curated images for smooth animation
-    setCurrentItems(curatedImages);
+    let revealTimerId;
+    let rotateTimerId;
+    let offset = 0;
+    const activeCurated = curatedImages.slice(0, MAX_ACTIVE_IMAGES);
 
-    // Load additional images in background after animation completes
-    const timer = setTimeout(() => {
+    // Start with curated images for smooth animation.
+    setCurrentItems(activeCurated);
+
+    // Load extra images in background, but keep active images capped for performance.
+    const loadTimerId = setTimeout(() => {
       setIsLoadingMore(true);
-      // Add more images after a shorter delay - limit to 12 total for performance
-      setTimeout(() => {
-        const limitedAdditionalImages = additionalImages.slice(0, 12); // Show only 12 additional images for better performance
-        const allImages = [...curatedImages, ...limitedAdditionalImages];
-        setCurrentItems(allImages);
+      revealTimerId = setTimeout(() => {
+        const applyRotatingSet = () => {
+          const rotatingExtras = getRotatingExtras(offset);
+          setCurrentItems([...activeCurated, ...rotatingExtras]);
+        };
+
+        applyRotatingSet();
         setIsLoadingMore(false);
+
+        if (additionalImages.length > extraSlots && extraSlots > 0) {
+          rotateTimerId = setInterval(() => {
+            offset = (offset + EXTRA_ROTATION_STEP) % additionalImages.length;
+            applyRotatingSet();
+          }, EXTRA_ROTATION_INTERVAL_MS);
+        }
       }, 500); // Load additional images after 500ms
     }, 1500); // Start loading after 1.5 seconds (let animation finish)
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(loadTimerId);
+      clearTimeout(revealTimerId);
+      clearInterval(rotateTimerId);
+    };
   }, []);
 
   return (
     <div
-      className={`fixed rounded-2xl bg-[#363636] overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] ${
+      className={`fixed rounded-3xl bg-[#363636] overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] ${
         isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
       }`}
       style={{
@@ -288,10 +325,11 @@ export default function PhotoViewer({
           images={currentItems}
           containerSize={600}
           sphereRadius={200}
-          dragSensitivity={0.6}
-          momentumDecay={0.94}
-          maxRotationSpeed={2}
-          baseImageScale={0.14}
+          dragSensitivity={0.72}
+          momentumDecay={0.84}
+          maxRotationSpeed={2.2}
+          maxDragRotationSpeed={5}
+          baseImageScale={0.125}
           hoverScale={1.2}
           perspective={0}
           autoRotate={false}

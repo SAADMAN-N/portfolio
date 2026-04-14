@@ -24,7 +24,7 @@ export default function AboutMe({
 }) {
   return (
     <div
-      className={`fixed rounded-2xl bg-black/50 backdrop-blur-lg overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] ${
+      className={`fixed rounded-3xl bg-black/50 backdrop-blur-lg overflow-hidden select-none transition-all duration-200 ease-in-out z-[10000] ${
         isClosing ? "opacity-0 scale-95" : "opacity-100 scale-100"
       }`}
       style={{
@@ -42,17 +42,17 @@ export default function AboutMe({
       onPointerUp={(e) => e.stopPropagation()}
     >
       <FlickeringGrid
-        className="absolute inset-0 pointer-events-none rounded-2xl"
+        className="absolute inset-0 pointer-events-none rounded-3xl"
         maxOpacity={0.2}
         width={width}
         height={height}
         color="black"
       />
       {/* Foreground content (Bento grid placeholder) */}
-      <div className="relative z-10 w-full h-full p-2 backdrop-blur-lg  overflow-auto rounded-2xl">
+      <div className="relative z-10 w-full h-full p-2 backdrop-blur-lg  overflow-auto rounded-3xl">
         {/* Put your <BentoGrid> here; this div stays above the FlickeringGrid */}
         <BentoGrid
-          className="h-full  w-full grid-cols-3 rounded-2xl  auto-rows-[10rem] gap-2 p-0 backdrop-blur-lg "
+          className="h-full w-full grid-cols-3 rounded-3xl auto-rows-[10rem] gap-2 p-0 backdrop-blur-lg [&>*]:rounded-3xl"
           background="white"
         >
           <BentoCard

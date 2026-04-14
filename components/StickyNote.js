@@ -2,6 +2,7 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { useState, useCallback, memo, useEffect, useRef } from "react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const StickyNote = memo(function StickyNote({
   id,
@@ -21,6 +22,9 @@ const StickyNote = memo(function StickyNote({
   onMinimize,
   onMinimizeAll,
   onDelete,
+  headerActions = null,
+  contentFontWeight = "font-normal",
+  contentStyleVariant = "default",
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isEditingContent, setIsEditingContent] = useState(false);
@@ -289,6 +293,21 @@ const StickyNote = memo(function StickyNote({
     [type, onDelete, id]
   );
 
+  const renderContentLineWithCode = useCallback((line) => {
+    return line.split(/(`[^`]+`)/g).map((part, i) =>
+      part.startsWith("`") && part.endsWith("`") ? (
+        <code
+          key={`${line}-${i}`}
+          className="font-mono text-[0.7rem] px-1 rounded bg-black/10"
+        >
+          {part.slice(1, -1)}
+        </code>
+      ) : (
+        part
+      )
+    );
+  }, []);
+
   console.log(
     `Rendering StickyNote ${id} at position:`,
     position,
@@ -308,7 +327,7 @@ const StickyNote = memo(function StickyNote({
         }
       }}
       data-sticky-note={id}
-      className={`absolute select-none rounded-lg border border-gray-300/30 flex flex-col overflow-hidden [border-radius:0.5rem] ${
+      className={`absolute select-none rounded-2xl border border-gray-300/30 flex flex-col overflow-hidden ${
         isDragging
           ? "z-20 scale-105 shadow-2xl"
           : isMinimized
@@ -392,14 +411,21 @@ const StickyNote = memo(function StickyNote({
             </h3>
           )}
         </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          {/* No save/cancel buttons needed for inline editing */}
+        <div
+          className="flex items-center gap-1 flex-shrink-0"
+          onMouseDown={handleStopPropagation}
+          onClick={handleStopPropagation}
+        >
+          {headerActions}
         </div>
       </div>
 
       {/* Content - only show when not minimized */}
       {!isMinimized && (
-        <div className="flex-1 p-3 overflow-hidden bg-white/95">
+        <ScrollArea
+          className="flex-1 bg-white/95"
+          viewportClassName="h-full p-3"
+        >
           <div className="h-full flex flex-col">
             {isEditingContent ? (
               <textarea
@@ -414,33 +440,58 @@ const StickyNote = memo(function StickyNote({
                 onFocus={(e) => {
                   e.target.select(); // Select all text when focused
                 }}
-                className="w-full flex-1 text-sm bg-transparent border-none resize-none focus:outline-none overflow-hidden leading-relaxed text-gray-800 font-normal"
+                className={`w-full flex-1 resize-none overflow-y-auto border-none bg-transparent text-sm leading-relaxed text-gray-800 focus:outline-none ${contentFontWeight}`}
                 placeholder=""
                 autoFocus
                 onClick={handleStopPropagation}
                 onMouseDown={handleStopPropagation}
               />
             ) : (
-              <p
-                className={`text-sm flex-1 overflow-hidden leading-relaxed text-gray-800 font-normal whitespace-pre-line ${
+              <div
+                className={`flex-1 text-sm leading-relaxed text-gray-800 ${
                   type === "visitor" ? "cursor-text" : "cursor-default"
-                }`}
+                } ${contentFontWeight}`}
                 onClick={handleContentClick}
                 onMouseDown={handleStopPropagation}
               >
-                {noteContent.split(/(`[^`]+`)/g).map((part, i) =>
-                  part.startsWith("`") && part.endsWith("`") ? (
-                    <code
-                      key={i}
-                      className="font-mono text-[0.7rem] px-1 rounded bg-black/10"
-                    >
-                      {part.slice(1, -1)}
-                    </code>
-                  ) : (
-                    part
-                  )
+                {contentStyleVariant === "bug-sections" ? (
+                  <div className="space-y-1">
+                    {noteContent.split("\n").map((line, idx) => {
+                      const trimmed = line.trim();
+                      const isHeading =
+                        /^•\s*(?:The\s+)?(Challenge|Problem|Solution|Key Learning):$/i.test(
+                          trimmed
+                        );
+                      if (!trimmed) {
+                        return <div key={`space-${idx}`} className="h-2" />;
+                      }
+                      return (
+                        <p
+                          key={`line-${idx}`}
+                          className={`${isHeading ? "font-semibold" : "pl-3 font-medium"}`}
+                        >
+                          {renderContentLineWithCode(line)}
+                        </p>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="whitespace-pre-line">
+                    {noteContent.split(/(`[^`]+`)/g).map((part, i) =>
+                      part.startsWith("`") && part.endsWith("`") ? (
+                        <code
+                          key={i}
+                          className="font-mono text-[0.7rem] px-1 rounded bg-black/10"
+                        >
+                          {part.slice(1, -1)}
+                        </code>
+                      ) : (
+                        part
+                      )
+                    )}
+                  </p>
                 )}
-              </p>
+              </div>
             )}
             {type === "visitor" && author && (
               <div className="text-xs opacity-60 mt-2 border-t border-gray-300/20 pt-2 italic text-gray-600">
@@ -448,13 +499,14 @@ const StickyNote = memo(function StickyNote({
               </div>
             )}
           </div>
-        </div>
+          <ScrollBar orientation="vertical" className="bg-transparent" />
+        </ScrollArea>
       )}
 
       {/* Resize handle - only show when not minimized */}
       {!isMinimized && (
         <div
-          className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-gray-300/30 hover:bg-gray-400/40 transition-colors duration-200 rounded-tl-lg"
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize bg-gray-300/30 hover:bg-gray-400/40 transition-colors duration-200 rounded-tl-2xl"
           onMouseDown={(e) => {
             e.stopPropagation();
             e.preventDefault();

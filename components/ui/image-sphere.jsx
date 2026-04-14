@@ -65,6 +65,34 @@ const SPHERE_MATH = {
   },
 };
 
+const MOTION_EPSILON = 0.001;
+const DRAG_DELTA_EPSILON = 0.2;
+const MAX_VISIBLE_WHILE_DRAGGING = 9;
+
+const SphereImage = React.memo(function SphereImage({ image, index, isDragging }) {
+  return (
+    <div className="w-full h-full sphere-image">
+      <div
+        className={`relative w-full h-full rounded-full overflow-hidden ${isDragging ? "" : "shadow-lg border-2 border-white/20"}`}
+      >
+        <img
+          src={image.src}
+          alt={image.alt}
+          className="w-full h-full object-cover"
+          draggable={false}
+          loading={index < 3 ? "eager" : "lazy"}
+          crossOrigin="anonymous"
+          decoding="async"
+          style={{
+            imageRendering: "optimizeSpeed",
+            backfaceVisibility: "hidden",
+          }}
+        />
+      </div>
+    </div>
+  );
+});
+
 // ==========================================
 // MAIN COMPONENT
 // ==========================================
@@ -76,6 +104,7 @@ const SphereImageGrid = ({
   dragSensitivity = 0.5,
   momentumDecay = 0.95,
   maxRotationSpeed = 5,
+  maxDragRotationSpeed = 8,
   baseImageScale = 0.12,
   hoverScale = 1.2,
   perspective = 1000,
@@ -89,7 +118,6 @@ const SphereImageGrid = ({
 
   const [isMounted, setIsMounted] = useState(false);
   const [rotation, setRotation] = useState({ x: 15, y: 15, z: 0 });
-  const [velocity, setVelocity] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePositions, setImagePositions] = useState([]);
@@ -98,6 +126,8 @@ const SphereImageGrid = ({
   const containerRef = useRef(null);
   const lastMousePos = useRef({ x: 0, y: 0 });
   const animationFrame = useRef(null);
+  const velocityRef = useRef({ x: 0, y: 0 });
+  const didMoveDuringDragRef = useRef(false);
 
   // ==========================================
   // COMPUTED VALUES
@@ -182,8 +212,8 @@ const SphereImageGrid = ({
       const worldPos = { x, y, z };
 
       // Calculate visibility with smooth fade zones
-      const fadeZoneStart = -10; // Start fading out
-      const fadeZoneEnd = -30; // Completely hidden
+      const fadeZoneStart = -25; // Balanced fade start for density/performance
+      const fadeZoneEnd = -65; // Hide deeper-back images sooner while staying full
       const isVisible = worldPos.z > fadeZoneEnd;
 
       // Calculate fade opacity based on Z position
@@ -236,6 +266,13 @@ const SphereImageGrid = ({
     [maxRotationSpeed]
   );
 
+  const clampDragSpeed = useCallback(
+    (speed) => {
+      return Math.max(-maxDragRotationSpeed, Math.min(maxDragRotationSpeed, speed));
+    },
+    [maxDragRotationSpeed]
+  );
+
   // ==========================================
   // PHYSICS & MOMENTUM
   // ==========================================
@@ -243,45 +280,52 @@ const SphereImageGrid = ({
   const updateMomentum = useCallback(() => {
     if (isDragging) return;
 
-    setVelocity((prev) => {
-      const newVelocity = {
-        x: prev.x * momentumDecay,
-        y: prev.y * momentumDecay,
-      };
+    const prevVelocity = velocityRef.current;
+    const dampedVelocity = {
+      x: prevVelocity.x * momentumDecay,
+      y: prevVelocity.y * momentumDecay,
+    };
 
-      // Stop animation if velocity is too low and auto-rotate is off
+    const nextVelocity =
+      !autoRotate &&
+      Math.abs(dampedVelocity.x) < 0.03 &&
+      Math.abs(dampedVelocity.y) < 0.03
+        ? { x: 0, y: 0 }
+        : dampedVelocity;
+
+    velocityRef.current = nextVelocity;
+
+    const rotateX = clampRotationSpeed(nextVelocity.x);
+    const rotateY = clampRotationSpeed(nextVelocity.y);
+    const shouldRotate =
+      autoRotate ||
+      Math.abs(rotateX) > MOTION_EPSILON ||
+      Math.abs(rotateY) > MOTION_EPSILON;
+
+    if (!shouldRotate) return;
+
+    setRotation((prevRotation) => {
+      const nextX = SPHERE_MATH.normalizeAngle(prevRotation.x + rotateX);
+      const nextY = SPHERE_MATH.normalizeAngle(
+        prevRotation.y + rotateY + (autoRotate ? autoRotateSpeed : 0)
+      );
+
       if (
-        !autoRotate &&
-        Math.abs(newVelocity.x) < 0.01 &&
-        Math.abs(newVelocity.y) < 0.01
+        Math.abs(nextX - prevRotation.x) <= MOTION_EPSILON &&
+        Math.abs(nextY - prevRotation.y) <= MOTION_EPSILON
       ) {
-        return { x: 0, y: 0 };
+        return prevRotation;
       }
-
-      return newVelocity;
-    });
-
-    setRotation((prev) => {
-      let newY = prev.y;
-
-      // Add auto-rotation to Y axis (horizontal rotation)
-      if (autoRotate) {
-        newY += autoRotateSpeed;
-      }
-
-      // Add momentum-based rotation
-      newY += clampRotationSpeed(velocity.y);
 
       return {
-        x: SPHERE_MATH.normalizeAngle(prev.x + clampRotationSpeed(velocity.x)),
-        y: SPHERE_MATH.normalizeAngle(newY),
-        z: prev.z,
+        x: nextX,
+        y: nextY,
+        z: prevRotation.z,
       };
     });
   }, [
     isDragging,
     momentumDecay,
-    velocity,
     clampRotationSpeed,
     autoRotate,
     autoRotateSpeed,
@@ -294,7 +338,8 @@ const SphereImageGrid = ({
   const handleMouseDown = useCallback((e) => {
     e.preventDefault();
     setIsDragging(true);
-    setVelocity({ x: 0, y: 0 });
+    velocityRef.current = { x: 0, y: 0 };
+    didMoveDuringDragRef.current = false;
     lastMousePos.current = { x: e.clientX, y: e.clientY };
   }, []);
 
@@ -304,34 +349,45 @@ const SphereImageGrid = ({
 
       const deltaX = e.clientX - lastMousePos.current.x;
       const deltaY = e.clientY - lastMousePos.current.y;
+      if (
+        Math.abs(deltaX) < DRAG_DELTA_EPSILON &&
+        Math.abs(deltaY) < DRAG_DELTA_EPSILON
+      ) {
+        return;
+      }
 
       const rotationDelta = {
         x: -deltaY * dragSensitivity,
         y: deltaX * dragSensitivity,
       };
+      didMoveDuringDragRef.current = true;
+      const clampedDragDelta = {
+        x: clampDragSpeed(rotationDelta.x),
+        y: clampDragSpeed(rotationDelta.y),
+      };
 
       setRotation((prev) => ({
-        x: SPHERE_MATH.normalizeAngle(
-          prev.x + clampRotationSpeed(rotationDelta.x)
-        ),
-        y: SPHERE_MATH.normalizeAngle(
-          prev.y + clampRotationSpeed(rotationDelta.y)
-        ),
+        x: SPHERE_MATH.normalizeAngle(prev.x + clampedDragDelta.x),
+        y: SPHERE_MATH.normalizeAngle(prev.y + clampedDragDelta.y),
         z: prev.z,
       }));
 
-      // Update velocity for momentum
-      setVelocity({
-        x: clampRotationSpeed(rotationDelta.x),
-        y: clampRotationSpeed(rotationDelta.y),
-      });
+      // Use a fraction of drag delta for momentum to avoid long "fling" tails.
+      velocityRef.current = {
+        x: clampedDragDelta.x * 0.4,
+        y: clampedDragDelta.y * 0.4,
+      };
 
       lastMousePos.current = { x: e.clientX, y: e.clientY };
     },
-    [isDragging, dragSensitivity, clampRotationSpeed]
+    [isDragging, dragSensitivity, clampDragSpeed]
   );
 
   const handleMouseUp = useCallback(() => {
+    if (didMoveDuringDragRef.current && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("photo-viewer-sphere-drag-end"));
+    }
+    didMoveDuringDragRef.current = false;
     setIsDragging(false);
   }, []);
 
@@ -339,7 +395,8 @@ const SphereImageGrid = ({
     e.preventDefault();
     const touch = e.touches[0];
     setIsDragging(true);
-    setVelocity({ x: 0, y: 0 });
+    velocityRef.current = { x: 0, y: 0 };
+    didMoveDuringDragRef.current = false;
     lastMousePos.current = { x: touch.clientX, y: touch.clientY };
   }, []);
 
@@ -351,33 +408,44 @@ const SphereImageGrid = ({
       const touch = e.touches[0];
       const deltaX = touch.clientX - lastMousePos.current.x;
       const deltaY = touch.clientY - lastMousePos.current.y;
+      if (
+        Math.abs(deltaX) < DRAG_DELTA_EPSILON &&
+        Math.abs(deltaY) < DRAG_DELTA_EPSILON
+      ) {
+        return;
+      }
 
       const rotationDelta = {
         x: -deltaY * dragSensitivity,
         y: deltaX * dragSensitivity,
       };
+      didMoveDuringDragRef.current = true;
+      const clampedDragDelta = {
+        x: clampDragSpeed(rotationDelta.x),
+        y: clampDragSpeed(rotationDelta.y),
+      };
 
       setRotation((prev) => ({
-        x: SPHERE_MATH.normalizeAngle(
-          prev.x + clampRotationSpeed(rotationDelta.x)
-        ),
-        y: SPHERE_MATH.normalizeAngle(
-          prev.y + clampRotationSpeed(rotationDelta.y)
-        ),
+        x: SPHERE_MATH.normalizeAngle(prev.x + clampedDragDelta.x),
+        y: SPHERE_MATH.normalizeAngle(prev.y + clampedDragDelta.y),
         z: prev.z,
       }));
 
-      setVelocity({
-        x: clampRotationSpeed(rotationDelta.x),
-        y: clampRotationSpeed(rotationDelta.y),
-      });
+      velocityRef.current = {
+        x: clampedDragDelta.x * 0.4,
+        y: clampedDragDelta.y * 0.4,
+      };
 
       lastMousePos.current = { x: touch.clientX, y: touch.clientY };
     },
-    [isDragging, dragSensitivity, clampRotationSpeed]
+    [isDragging, dragSensitivity, clampDragSpeed]
   );
 
   const handleTouchEnd = useCallback(() => {
+    if (didMoveDuringDragRef.current && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("photo-viewer-sphere-drag-end"));
+    }
+    didMoveDuringDragRef.current = false;
     setIsDragging(false);
   }, []);
 
@@ -395,7 +463,7 @@ const SphereImageGrid = ({
 
   useEffect(() => {
     let lastTime = 0;
-    const targetFPS = 45; // Reduce to 45 FPS for better performance
+    const targetFPS = 60; // Smoother visual response during drags
     const frameInterval = 1000 / targetFPS;
 
     const animate = (currentTime) => {
@@ -454,35 +522,29 @@ const SphereImageGrid = ({
     return calculateWorldPositions();
   }, [imagePositions, rotation, actualSphereRadius, baseImageSize]);
 
-  // Create individual memoized image components
-  const MemoizedImage = React.memo(({ image, index }) => (
-    <div className="w-full h-full sphere-image">
-      <div className="relative w-full h-full rounded-full overflow-hidden shadow-lg border-2 border-white/20">
-        <img
-          src={image.src}
-          alt={image.alt}
-          className="w-full h-full object-cover"
-          draggable={false}
-          loading={index < 3 ? "eager" : "lazy"}
-          // Add these attributes to prevent re-requests
-          crossOrigin="anonymous"
-          decoding="async"
-          // Force cache behavior
-          style={{
-            imageRendering: "optimizeSpeed",
-            backfaceVisibility: "hidden",
-          }}
-        />
-      </div>
-    </div>
-  ));
-
-  // Memoize image elements to prevent re-creation - more aggressive memoization
+  // Memoize image elements to prevent re-creation.
   const memoizedImages = useMemo(() => {
     return images.map((image, index) => (
-      <MemoizedImage key={`memo-${image.id}`} image={image} index={index} />
+      <SphereImage
+        key={`memo-${image.id}`}
+        image={image}
+        index={index}
+        isDragging={isDragging}
+      />
     ));
-  }, [images]);
+  }, [images, isDragging]);
+
+  const visibleWhileDraggingSet = useMemo(() => {
+    if (!isDragging || !worldPositions.length) return null;
+
+    const topIndices = worldPositions
+      .map((position, index) => ({ index, zIndex: position?.zIndex ?? -Infinity }))
+      .sort((a, b) => b.zIndex - a.zIndex)
+      .slice(0, MAX_VISIBLE_WHILE_DRAGGING)
+      .map((entry) => entry.index);
+
+    return new Set(topIndices);
+  }, [isDragging, worldPositions]);
 
   const renderSpotlightModal = () => {
     if (!selectedImage) return null;
@@ -496,7 +558,7 @@ const SphereImageGrid = ({
         }}
       >
         <div
-          className="bg-white rounded-xl max-w-xs w-64 overflow-hidden"
+          className="bg-white rounded-3xl max-w-xs w-64 overflow-hidden"
           onClick={(e) => e.stopPropagation()}
           style={{
             animation: "scaleIn 0.3s ease-out",
@@ -602,6 +664,9 @@ const SphereImageGrid = ({
           {images.map((image, index) => {
             const position = worldPositions[index];
             if (!position || !position.isVisible) return null;
+            if (visibleWhileDraggingSet && !visibleWhileDraggingSet.has(index)) {
+              return null;
+            }
 
             // Pre-calculate values to avoid repeated calculations
             const imageSize = baseImageSize * position.scale;
@@ -622,7 +687,7 @@ const SphereImageGrid = ({
                   opacity: position.fadeOpacity,
                   transform: `translate(-50%, -50%) scale(${finalScale})`,
                   zIndex: position.zIndex,
-                  willChange: "transform, opacity",
+                  willChange: isDragging ? "transform, opacity" : "auto",
                 }}
                 onMouseEnter={() => !isDragging && setHoveredIndex(index)}
                 onMouseLeave={() => !isDragging && setHoveredIndex(null)}

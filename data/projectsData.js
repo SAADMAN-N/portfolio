@@ -243,7 +243,7 @@ export const projectsData = [
       {
         id: "indexing",
         title: "Codebase Indexing Pipeline",
-        code: `graph TD
+        code: `flowchart LR
     A[GitHub Repository] --> B[LangChain GithubRepoLoader]
     B --> C[Recursive File Loading]
     C --> D[Filter Lock Files]
@@ -255,6 +255,203 @@ export const projectsData = [
     style A fill:#24292e,color:#fff
     style G fill:#336791,color:#fff
     style H fill:#22c55e,color:#fff`,
+      },
+    ],
+  },
+  {
+    id: 5,
+    title: "Obliq.chat",
+    bio: "Next.js 16 • React 19 • AI SDK 6 • Supabase • Prisma • Postgres",
+    icon: "/projects-icon.svg",
+    screenshot: "/Obliq_images/Screenshot 2026-04-14 at 12.35.02\u202fAM.png",
+    screenshots: [
+      "/Obliq_images/Screenshot 2026-04-14 at 12.35.02\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.29.49\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.34.31\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.34.52\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.35.14\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.35.25\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.39.25\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.40.50\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.41.03\u202fAM.png",
+      "/Obliq_images/Screenshot 2026-04-14 at 1.08.41\u202fAM.png",
+    ],
+    screenshotPositions: {
+      "/Obliq_images/Screenshot 2026-04-14 at 12.35.02\u202fAM.png":
+        "center 72%",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.29.49\u202fAM.png": "top",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.34.31\u202fAM.png": "center",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.34.52\u202fAM.png": "top",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.35.14\u202fAM.png": "top",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.35.25\u202fAM.png": "top",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.39.25\u202fAM.png":
+        "center 62%",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.40.50\u202fAM.png": "top",
+      "/Obliq_images/Screenshot 2026-04-14 at 12.41.03\u202fAM.png": "center",
+      "/Obliq_images/Screenshot 2026-04-14 at 1.08.41\u202fAM.png": "top",
+    },
+    description:
+      "Obliq.chat is a Next.js-based AI workspace that combines streaming chat, grounded PDF analysis, image generation, voice tools, project organization, and persistent thread-based runtime controls into a single product. Built with React, TypeScript, assistant-ui, the Vercel AI SDK, Prisma, PostgreSQL, Supabase, Backblaze B2, and provider-specific model integrations, it is designed to support serious creative and knowledge workflows rather than generic prompt-based interaction.",
+    technologies: [
+      "Next.js 16",
+      "React 19",
+      "TypeScript",
+      "Tailwind CSS v4",
+      "class-variance-authority",
+      "Framer Motion",
+      "Vercel AI SDK 6 beta",
+      "assistant-ui",
+      "Supabase",
+      "PostgreSQL",
+      "Prisma ORM",
+      "Backblaze B2 (S3-compatible)",
+      "Upstash Redis",
+      "Zod",
+      "React Hook Form",
+      "Konva",
+      "React Konva",
+      "Three.js",
+      "React Three Fiber",
+      "Recharts",
+      "Mermaid",
+      "Shiki",
+      "KaTeX",
+      "pdf.js",
+      "OpenAI",
+      "Google",
+      "AI Gateway",
+      "MCP-compatible tooling",
+      "Replicate image models",
+      "MinerU PDF parsing",
+    ],
+    features: [
+      "Streaming AI chat with model-aware runtime controls",
+      "Per-thread model selection and reasoning controls",
+      "Web search support inside conversations",
+      "Attachment-aware chat flows",
+      "Voice dictation and speech playback",
+      "PDF-grounded document mode with page-aware citations",
+      "Dedicated image generation workspace with model-specific controls",
+      "Prompt-first, reference-first, fill, edit, and inpainting workflows",
+      "Project-based organization of AI conversations",
+      "Structured persistence for chats, documents, and media artifacts",
+    ],
+    challenge:
+      "Maintaining a single canonical AI runtime across chat, document, image, and voice surfaces is complex because each workflow has different runtime expectations. The image landing page and image workspace are still active iteration surfaces, provider schemas differ heavily model-by-model, and Document Mode is intentionally PDF-first in v1 rather than broad file-type coverage.",
+    solution:
+      "Built a thread-scoped orchestration layer on Next.js App Router with assistant-ui and AI SDK runtime controls, backed by Prisma/Postgres persistence, Backblaze B2 artifact storage, and specialized pipelines like MinerU for grounded PDF workflows.",
+    learning:
+      "A generic AI interface is not enough for real creative and knowledge work. Per-thread runtime configuration, strong streaming transport abstractions, and persisted document/media artifacts are core product architecture concerns. Provider integrations must be treated as continuously validated contracts, and clean boundaries between orchestration and UI make it much easier to evolve from a chat app into a broader AI workspace.",
+    githubUrl: "https://obliq.chat",
+    liveUrl: "https://obliq.chat",
+    status: "Completed",
+    metrics: {
+      architecture: "Multi-surface AI workspace architecture",
+      documentMode: "Grounded PDF Q&A with page-aware citations",
+      imageSystem: "Model-specific parameter contracts",
+      runtime: "Thread-scoped persistent AI runtime",
+    },
+    highlights: [
+      "Treats AI as an environment, not a single feature",
+      "Combines conversation, analysis, generation, and editing in one system",
+      "Supports both conversational and visual workflows with persistent context",
+      "Document Mode returns grounded answers with page-aware citations",
+      "Image workspace uses model-specific controls instead of fake one-size-fits-all forms",
+      "Per-thread runtime state keeps sessions configurable and continuous",
+      "Clean boundaries across interface, orchestration, domain behavior, and infrastructure",
+      "Premium, calm workspace UX with continuity-first product design",
+    ],
+    biggestBugs: [
+      {
+        challenge:
+          "Keeping multiple fast-evolving AI surfaces aligned while integrating many external model providers with different schemas and capabilities",
+        problem:
+          "Image model contracts vary significantly across providers, multi-surface state can drift between chat/document/image/voice contexts, and UI polish can fall out of sync when runtime behavior and provider integrations change quickly",
+        solution:
+          "Implemented strict per-model parameter mapping, defensive validation and docs-aligned contracts, thread-scoped runtime state, and staged v1 scope decisions (PDF-first depth over shallow everything) to keep reliability and UX quality high while iterating",
+        learning:
+          "Rich AI products need both runtime correctness and strong interface judgment. Design polish, persistence, and architecture boundaries are not optional details; they are core to making advanced capabilities feel trustworthy and usable.",
+        bgColor: "#0EA5E9",
+      },
+      {
+        challenge:
+          "Keeping the image landing page visually bold while still making the hero text readable over a dynamic collage of cards and mixed artwork",
+        problem:
+          "The hero layout kept breaking because the text and image cards were using the wrong structure. Sometimes the text sat in normal flow while the cards were absolutely positioned, which created overlap bugs, clipping, blank space, and disconnected composition.",
+        solution:
+          "Reworked the hero into a layered composition, then tuned spacing, card placement, and text treatment separately. Instead of relying on margin hacks, I treated the hero as one composed visual system with controlled overlap and readable foreground text.",
+        learning:
+          "Good visual design is not just styling. If the layout model is wrong, no amount of spacing tweaks will fix it cleanly. Strong UI needs the right structure first, then polish.",
+        bgColor: "#60A5FA",
+      },
+      {
+        challenge:
+          "Making document chat feel trustworthy enough for serious use, not just like a demo that sort of reads PDFs",
+        problem:
+          "Simple file upload and text extraction were not enough. Without proper parsing, chunking, indexing, and page-aware citation handling, responses could feel vague, hard to verify, or disconnected from the original document.",
+        solution:
+          "Built the document pipeline around structured parsing, chunk normalization, embeddings, indexing, and grounded page-aware citations. The goal was not just to answer questions, but to let users trace answers back to the source reliably.",
+        learning:
+          "For document AI, trust is a product feature. Users do not just want an answer; they want confidence that the answer is grounded, navigable, and verifiable.",
+        bgColor: "#22C55E",
+      },
+      {
+        challenge:
+          "Keeping long-lived AI conversation threads stable while supporting mixed workflows like normal text chat, image generation, attachments, and streamed responses inside the same runtime",
+        problem:
+          "A thread could become poisoned after certain errors or malformed multimodal states. For example, if an image generation happened inside a normal text chat, the persisted message history and future streamed turns could drift away from the message shape expected by the runtime. Once that happened, later answers in the same thread could inherit invalid context, fail hydration, or behave inconsistently because the thread state itself was no longer trustworthy.",
+        solution:
+          "Treated thread integrity as a contract problem, not just a UI bug. Used AI SDK message conversion and validation boundaries to normalize payloads before they entered the runtime, validated request bodies and persisted structures, converted transport messages into canonical message shapes, and separated generated image artifacts from regular text-thread state more carefully. On the client side, relied on thread-scoped runtime configuration and safer hydration patterns through AI SDK hooks and assistant-ui runtime so bad states would not silently cascade into future turns.",
+        learning:
+          "In AI products, one malformed turn can corrupt much more than one response. Multi-step conversational systems need strict normalization, validation, and canonical thread state at every boundary. If the thread model is not protected, future answers can be poisoned even when the original bug seems unrelated.",
+        bgColor: "#A78BFA",
+      },
+    ],
+    diagrams: [
+      {
+        id: "obliq-architecture",
+        title: "Architecture Diagram",
+        code: `flowchart LR
+  UI["Next.js App Router UI"] --> Runtime["assistant-ui + AI SDK runtime"]
+  Runtime --> ChatAPI["/api/chat"]
+  Runtime --> ImageUI["Image workspace"]
+  Runtime --> DocUI["Document mode"]
+  ChatAPI --> Orchestrator["Turn orchestrator"]
+  Orchestrator --> Models["LLM and image model providers"]
+  Orchestrator --> Tools["Search, attachments, tool calls"]
+  ChatAPI --> DB["Prisma + PostgreSQL"]
+  ChatAPI --> Storage["Backblaze B2 storage"]
+  DocUI --> Parser["MinerU PDF parser"]
+  Parser --> Storage
+  Storage --> Indexer["Chunking + embeddings + knowledge index"]
+  Indexer --> DB
+  Runtime --> Voice["Dictation + speech adapters"]`,
+      },
+      {
+        id: "obliq-document-mode",
+        title: "Document Mode Diagram",
+        code: `flowchart LR
+  Upload["User uploads PDF"] --> Store["Store original file"]
+  Store --> Parse["MinerU parses document"]
+  Parse --> Artifacts["Structured parse artifacts"]
+  Artifacts --> Chunk["Chunk and normalize content"]
+  Chunk --> Embed["Generate embeddings"]
+  Embed --> Index["Persist chunks and vector metadata"]
+  Index --> Query["Grounded chat query"]
+  Query --> Cite["Return answer with page-aware citations"]
+  Cite --> UI["Document mode UI with citation navigation"]`,
+      },
+      {
+        id: "obliq-image-workspace",
+        title: "Image Workspace Diagram",
+        code: `flowchart LR
+  Prompt["Prompt / reference / edit input"] --> Surface["Image session surface"]
+  Surface --> ModelConfig["Model-specific parameter mapping"]
+  ModelConfig --> ImageAPI["Image generation route"]
+  ImageAPI --> Provider["Replicate / provider model"]
+  Provider --> Output["Generated images"]
+  Output --> Persist["Persist outputs and attachments"]
+  Persist --> Session["Image session history and previews"]`,
       },
     ],
   },

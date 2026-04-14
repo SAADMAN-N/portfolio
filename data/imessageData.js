@@ -30,6 +30,7 @@ export const conversations = [
     avatar: null,
     lastMessage: "remember to book my flight",
     lastDate: "1/26/26",
+    unread: true,
     isActive: false,
     messages: [
       { id: "t1", type: "timestamp", text: "Yesterday, 4:15 PM" },
@@ -55,6 +56,7 @@ export const conversations = [
     avatar: null,
     lastMessage: "Meeting at the library at 3pm?",
     lastDate: "1/26/26",
+    unread: true,
     isActive: false,
     messages: [
       { id: "1", type: "incoming", text: "Meeting at the library at 3pm?" },
@@ -79,6 +81,7 @@ export const conversations = [
     avatar: null,
     lastMessage: "Good luck with your interview tomorrow!",
     lastDate: "1/24/26",
+    unread: true,
     isActive: false,
     messages: [
       {

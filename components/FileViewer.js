@@ -45,7 +45,7 @@ export default function FileViewer({
 }) {
   return (
     <div
-      className={`fixed overflow-hidden select-none transition-all duration-200 ease-in-out z-[10001] rounded-2xl flex flex-col ${
+      className={`fixed overflow-hidden select-none transition-all duration-200 ease-in-out z-[10001] rounded-3xl flex flex-col ${
         isClosing ? "opacity-0" : "opacity-100"
       }`}
       style={{

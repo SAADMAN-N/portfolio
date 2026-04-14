@@ -7,7 +7,7 @@ import DesktopItem from "./DesktopItem";
 import desktopItems from "@/data/desktopItems";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import {
   DndContext,
   useDraggable,
@@ -26,8 +26,6 @@ import { GlowEffect } from "@/components/ui/glow-effect";
 import { MorphingMessagePopover } from "@/components/ui/morphing-message-popover";
 import { aboutMeWindows } from "@/data/aboutMeWindows";
 import { stickyNotesData, getApprovedNotes } from "@/data/stickyNotesData";
-import MusicPlayerCard from "@/components/ruixen/music-player-card";
-import { musicTracks } from "@/data/musicPlayerData";
 
 function DraggableItem({ item, onItemClick }) {
   const { setNodeRef, listeners, attributes, transform, isDragging } =
@@ -90,6 +88,7 @@ export default function Desktop() {
   const [isIMessageClosing, setIsIMessageClosing] = useState(false);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
   const [isTrashClosing, setIsTrashClosing] = useState(false);
+  const suppressNextDesktopClickRef = useRef(false);
 
   // Inspirational quotes for rotation
   const quotes = [
@@ -126,7 +125,7 @@ export default function Desktop() {
       activationConstraint: {
         distance: 8, // Require 8px of movement before starting drag
       },
-    })
+    }),
   );
 
   // Load sticky notes from localStorage on component mount
@@ -201,7 +200,7 @@ export default function Desktop() {
                 ...it,
                 position: { top: saved[it.id].top, left: saved[it.id].left },
               }
-            : it
+            : it,
         );
         setItems(merged);
       } else {
@@ -217,7 +216,7 @@ export default function Desktop() {
   useEffect(() => {
     if (!initialized || items.length === 0) return;
     const positions = Object.fromEntries(
-      items.map((it) => [it.id, it.position])
+      items.map((it) => [it.id, it.position]),
     );
     try {
       localStorage.setItem("desktopPositions", JSON.stringify(positions));
@@ -261,7 +260,7 @@ export default function Desktop() {
           const clamped = clampToBounds(it.position);
           // const snapped = snapToGrid(clamped); // Commented out snapping to grid
           return { ...it, position: clamped }; // Use clamped position directly
-        })
+        }),
       );
     }
 
@@ -335,6 +334,11 @@ export default function Desktop() {
   }, [isTrashOpen]);
 
   const handleDesktopClick = (e) => {
+    if (suppressNextDesktopClickRef.current) {
+      suppressNextDesktopClickRef.current = false;
+      return;
+    }
+
     // Don't close windows if clicking on sticky notes or their children
     if (e.target.closest("[data-sticky-note]")) {
       return;
@@ -342,14 +346,14 @@ export default function Desktop() {
 
     // Start closing animation for all open windows
     const currentlyOpen = Object.keys(openWindows).filter(
-      (key) => openWindows[key]
+      (key) => openWindows[key],
     );
     if (currentlyOpen.length > 0) {
       setClosingWindows(
         currentlyOpen.reduce((acc, key) => {
           acc[key] = true;
           return acc;
-        }, {})
+        }, {}),
       );
 
       // After animation completes, actually close the windows
@@ -381,7 +385,7 @@ export default function Desktop() {
   const handleStickyNoteUpdate = useCallback((updatedNote) => {
     setStickyNotes((prev) => {
       const updated = prev.map((note) =>
-        note.id === updatedNote.id ? updatedNote : note
+        note.id === updatedNote.id ? updatedNote : note,
       );
       return updated;
     });
@@ -455,7 +459,7 @@ export default function Desktop() {
   const handleMinimizeAll = useCallback(() => {
     setMinimizedNotes((prev) => {
       const allNoteIds = new Set(
-        getApprovedNotes(stickyNotes).map((note) => note.id)
+        getApprovedNotes(stickyNotes).map((note) => note.id),
       );
       return allNoteIds;
     });
@@ -467,6 +471,26 @@ export default function Desktop() {
 
   const handleDeleteStickyNote = useCallback((noteId) => {
     setStickyNotes((prev) => prev.filter((note) => note.id !== noteId));
+  }, []);
+
+  useEffect(() => {
+    const markSuppressNextClick = () => {
+      suppressNextDesktopClickRef.current = true;
+      setTimeout(() => {
+        suppressNextDesktopClickRef.current = false;
+      }, 250);
+    };
+
+    window.addEventListener(
+      "photo-viewer-sphere-drag-end",
+      markSuppressNextClick,
+    );
+    return () => {
+      window.removeEventListener(
+        "photo-viewer-sphere-drag-end",
+        markSuppressNextClick,
+      );
+    };
   }, []);
 
   return (
@@ -495,7 +519,7 @@ export default function Desktop() {
           const usableHeight = vh - topPadding - dockHeight - 16;
           const rowsPerColumn = Math.max(
             1,
-            Math.floor(usableHeight / verticalGap)
+            Math.floor(usableHeight / verticalGap),
           );
           const columnGap = 24;
           setItems(
@@ -506,7 +530,7 @@ export default function Desktop() {
                 vw - iconW - rightPadding - col * (iconW + columnGap);
               const top = topPadding + row * verticalGap;
               return { ...it, position: { top, left } };
-            })
+            }),
           );
 
           // Reset sticky notes to their initial positions/content from data file
@@ -532,7 +556,7 @@ export default function Desktop() {
               const clamped = clampToBounds(next);
               // const snapped = snapToGrid(clamped); // Commented out snapping to grid
               return { ...it, position: clamped }; // Use clamped position directly
-            })
+            }),
           );
         }}
       >
@@ -563,10 +587,10 @@ export default function Desktop() {
                 "from",
                 note.position,
                 "to",
-                next
+                next,
               );
               return { ...note, position: next };
-            })
+            }),
           );
         }, [])}
       >
@@ -575,7 +599,7 @@ export default function Desktop() {
           console.log(
             "Rendering sticky notes (first DnD context):",
             approvedNotes.length,
-            approvedNotes
+            approvedNotes,
           );
           return approvedNotes.map((note) => (
             <StickyNote
@@ -630,7 +654,7 @@ export default function Desktop() {
           scale={1.01}
           duration={4}
         />
-        <div className="relative w-full h-full rounded-xl bg-black p-4 flex flex-col justify-between text-white overflow-hidden select-none">
+        <div className="relative w-full h-full rounded-3xl bg-black p-4 flex flex-col justify-between text-white overflow-hidden select-none">
           {/* Background stickers */}
           <div className="absolute top-6 right-2 rotate-2 pointer-events-none">
             <img
@@ -689,25 +713,10 @@ export default function Desktop() {
 
       {/* Reminders Component - rendered before desktop windows */}
       <Reminders
-        position={{ top: 250, left: 100 }}
+        position={{ top: 500, left: 1200 }}
         isMinimized={isRemindersMinimized}
         onMinimize={handleRemindersMinimize}
       />
-
-      {/* Music Player Card - positioned to avoid overlap with Todo List (#450) and Ideas (#450) */}
-      <div
-        className="absolute z-20"
-        style={{ top: 350, left: 1000 }}
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-        onMouseUp={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
-        onPointerUp={(e) => e.stopPropagation()}
-      >
-        <div className="flex min-h-[400px] w-full items-center justify-center px-8">
-          <MusicPlayerCard tracks={musicTracks} />
-        </div>
-      </div>
 
       {/* Desktop Windows - rendered after notes for proper layering */}
       {desktopItems.map((item) => {
