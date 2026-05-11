@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
             w-full h-screen 
             bg-[#f7f3ed] 
             bg-grid bg-grid-size 
-            font-['SF_Pro_Display'] 
+            font-sans
             [background-attachment:fixed]
           "
         >
